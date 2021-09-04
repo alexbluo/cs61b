@@ -23,6 +23,75 @@ public class TimeSLList {
 
     public static void timeGetLast() {
         // TODO: YOUR CODE HERE
+        AList<Integer> Ns = new AList<Integer>();
+        Ns.addLast(8000);
+        Ns.addLast(16000);
+        Ns.addLast(32000);
+        Ns.addLast(64000);
+        Ns.addLast(128000);
+        AList<Integer> ops = new AList<Integer>();
+        ops.addLast(10000);
+        ops.addLast(10000);
+        ops.addLast(10000);
+        ops.addLast(10000);
+        ops.addLast(10000);
+        AList<Double> times = new AList<Double>();
+
+        SLList<Integer> fill = new SLList<Integer>();
+        for (int n = 0; n < 8000; n++) {
+            fill.addLast(1);
+        }
+        Stopwatch sw = new Stopwatch();
+        for (int m = 0; m < 10000; m++) {
+            fill.getLast();
+        }
+        double time = sw.elapsedTime();
+        times.addLast(time);
+
+        fill = new SLList<Integer>();
+        for (int n = 0; n < 16000; n++) {
+            fill.addLast(1);
+        }
+        sw = new Stopwatch();
+        for (int m = 0; m < 10000; m++) {
+            fill.getLast();
+        }
+        time = sw.elapsedTime();
+        times.addLast(time);
+
+        fill = new SLList<Integer>();
+        for (int n = 0; n < 32000; n++) {
+            fill.addLast(1);
+        }
+        sw = new Stopwatch();
+        for (int m = 0; m < 10000; m++) {
+            fill.getLast();
+        }
+        time = sw.elapsedTime();
+        times.addLast(time);
+
+        fill = new SLList<Integer>();
+        for (int n = 0; n < 64000; n++) {
+            fill.addLast(1);
+        }
+        sw = new Stopwatch();
+        for (int m = 0; m < 10000; m++) {
+            fill.getLast();
+        }
+        time = sw.elapsedTime();
+        times.addLast(time);
+
+        fill = new SLList<Integer>();
+        for (int n = 0; n < 128000; n++) {
+            fill.addLast(1);
+        }
+        sw = new Stopwatch();
+        for (int m = 0; m < 10000; m++) {
+            fill.getLast();
+        }
+        time = sw.elapsedTime();
+        times.addLast(time);
+        printTimingTable(Ns, times, ops);
     }
 
 }
