@@ -1,10 +1,11 @@
 package deque;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
 //making nextFront and nextLast able to go negative/over array.length - 1 and using array.length - nextFront etc mightve PARTIALLY helped this massive abomination of a headache but too late now
 // nearly guaranteed to have a bug in it but please let me escape this nightmare
-public class ArrayDeque<Item> {
+public class ArrayDeque<Item> implements Iterable<Item> {
     Item[] array;
     private int size;
     private int nextFront = 0;
@@ -134,21 +135,50 @@ public class ArrayDeque<Item> {
         }
         array = newArray;
     }
+    public Iterator<Item> iterator() {
+        return new ArrayDequeIterator();
+    }
+
+    private class ArrayDequeIterator implements Iterator<Item> {
+        private int wizPos;
+        public ArrayDequeIterator() {
+            wizPos = 0;
+        }
+        public boolean hasNext() {
+            return wizPos != size;
+        }
+        public Item next() {
+            Item returnItem = array[wizPos];
+            wizPos++;
+            return returnItem;
+        }
+    }
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != this.getClass()) {
+            return false;
+        }
+        ArrayDeque<Item> other = (ArrayDeque<Item>) o;
+        Iterator<Item> seer = other.iterator();
+        for (int i = 0; i < array.length; i++) {
+            if (this.get(i) != other.get(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
     public static void main(String[] args) {
         ArrayDeque<Integer> test = new ArrayDeque<>();
-        for (int i = 0; i < 10; i++) {
-            test.addLast(i);
-        }
-        test.removeLast();
-        test.removeLast();
-        test.removeLast();
-        test.removeLast();
-        test.removeLast();
-        test.removeLast();
-        test.removeLast();
+        ArrayDeque<Integer> test2 = new ArrayDeque<>();
+        test.addLast(1);
+        test.addLast(2);
+        test.addLast(3);
+        test2.addLast(1);
+        test2.addLast(2);
+        test2.addLast(4);
 
-
-        test.printDeque();
-        System.out.print(test.get(4));
+        System.out.print(test.equals(test2));
     }
 }
