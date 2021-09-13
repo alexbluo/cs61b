@@ -1,7 +1,7 @@
 package deque;
 import java.util.*;
 
-public class LinkedListDeque<Item> implements Iterable<Item> {
+public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
 
     private class node {
         public node prev;
@@ -15,10 +15,13 @@ public class LinkedListDeque<Item> implements Iterable<Item> {
     }
     private int size;
     private final node sen;
+    private node currentNode;
+    private int currentIndex;
     public LinkedListDeque() {
         sen = new node(null,  null, null);
         sen.prev = sen;
         sen.next = sen.prev;
+        currentNode = sen.next;
     }
     public void addFirst(Item item) {
         node newNode = new node(sen, item, sen.next);
@@ -32,9 +35,6 @@ public class LinkedListDeque<Item> implements Iterable<Item> {
         sen.prev = newNode;
 
         size++;
-    }
-    public boolean isEmpty() {
-        return sen.next == sen;
     }
     public int size() {
         return size;
@@ -51,14 +51,18 @@ public class LinkedListDeque<Item> implements Iterable<Item> {
         Item returnThis = sen.next.item;
         sen.next.next.prev = sen;
         sen.next = sen.next.next;
-        size--;
+        if (size != 0) {
+            size--;
+        }
         return returnThis;
     }
     public Item removeLast() {
         Item returnThis = sen.prev.item;
         sen.prev.prev.next = sen;
         sen.prev = sen.prev.prev;
-        size--;
+        if (size != 0) {
+            size--;
+        }
         return returnThis;
     }
     public Item get(int index) {
@@ -106,14 +110,18 @@ public class LinkedListDeque<Item> implements Iterable<Item> {
         return true;
     }
     public Item getRecursive(int index) {
-        node loc = sen.next;
-        if (index == 0) {
-            return loc.item;
-        } else if (index >= size) {
+        if (index >= size) {
             return null;
+        }
+        if (currentIndex == index) {
+            Item temp = currentNode.next.item;
+            currentNode = sen.next;
+            currentIndex = 0;
+            return temp;
         } else {
-            loc = loc.next;
-            return getRecursive(index - 1);
+            currentNode = currentNode.next;
+            currentIndex++;
+            return getRecursive(index);
         }
     }
     public static void main(String[] args) {
@@ -126,6 +134,7 @@ public class LinkedListDeque<Item> implements Iterable<Item> {
         for (int item : list) {
             System.out.println(item);
         }
-        System.out.println(list.getRecursive(2));
+
+        System.out.println(list.isEmpty());
     }
 }
