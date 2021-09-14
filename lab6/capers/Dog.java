@@ -57,6 +57,7 @@ public class Dog { // TODO
      */
     public void saveDog() {
         // TODO (hint: don't forget dog names are unique)
+        Utils.writeContents(Dog.DOG_FOLDER, this);
     }
 
     @Override

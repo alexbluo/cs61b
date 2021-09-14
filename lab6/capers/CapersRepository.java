@@ -35,7 +35,6 @@ public class CapersRepository {
     public static void setupPersistence() {
         CAPERS_FOLDER.mkdir();
         final File story = new File(CAPERS_FOLDER + "/story");
-        System.out.print(Dog.DOG_FOLDER);
         try {
             Dog.DOG_FOLDER.createNewFile();
             story.createNewFile();
@@ -60,6 +59,9 @@ public class CapersRepository {
      */
     public static void makeDog(String name, String breed, int age) {
         // TODO
+        Dog newDog = new Dog(name, breed, age);
+        newDog.saveDog();
+        System.out.println(newDog.toString());
     }
 
     /**
