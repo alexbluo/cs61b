@@ -1,7 +1,8 @@
 package capers;
 
 import java.io.File;
-
+import java.io.IOException;
+import java.util.*;
 import static capers.Utils.*;
 
 /** Canine Capers: A Gitlet Prelude.
