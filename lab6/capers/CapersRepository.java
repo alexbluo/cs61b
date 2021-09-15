@@ -34,9 +34,9 @@ public class CapersRepository {
      */
     public static void setupPersistence() {
         CAPERS_FOLDER.mkdir();
+        Dog.DOG_FOLDER.mkdir();
         final File story = new File(CAPERS_FOLDER + "/story");
         try {
-            Dog.DOG_FOLDER.createNewFile();
             story.createNewFile();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -50,6 +50,8 @@ public class CapersRepository {
      */
     public static void writeStory(String text) {
         // TODO
+        writeContents(join(CAPERS_FOLDER, "/story"), readContentsAsString(join(CAPERS_FOLDER, "/story")), text, "\n");
+        System.out.print(readContentsAsString(join(CAPERS_FOLDER, "/story")));
     }
 
     /**
@@ -72,5 +74,7 @@ public class CapersRepository {
      */
     public static void celebrateBirthday(String name) {
         // TODO
+        File file = new File(name);
+        //file.haveBirthday();
     }
 }
