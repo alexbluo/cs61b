@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+
 import static gitlet.Utils.*;
 
 // TODO: any imports you need here
@@ -26,4 +27,15 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /* TODO: fill in the rest of this class. */
+
+    public static void init() {
+        if (!GITLET_DIR.exists()) {
+            try {
+                GITLET_DIR.mkdir();
+            } catch (GitletException ex) {
+                ex.getMessage();
+            }
+        }
+        Commit firstCommit = new Commit();
+    }
 }
