@@ -41,9 +41,8 @@ public class Dog implements Serializable { // TODO
      */
     public static Dog fromFile(String name) {
         // TODO (hint: look at the Utils file)
-        //Dog d = readObject(name, Dog.class);
-        //return
-        return null;
+        Dog d = readObject(join(DOG_FOLDER, name), Dog.class);
+        return d;
     }
 
     /**
@@ -60,16 +59,15 @@ public class Dog implements Serializable { // TODO
      */
     public void saveDog() {
         // TODO (hint: don't forget dog names are unique)
-        final File name = new File(DOG_FOLDER + this.name);
-        //if (!!this.name.equals()) {
+        final File newFile = join(DOG_FOLDER, this.name);
+        if (!join(DOG_FOLDER + this.name).exists()) {
             try {
-                name.createNewFile();
+                newFile.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            Utils.writeObject(Utils.join(Dog.DOG_FOLDER, this.name), this);
-        //}
-
+        }
+        Utils.writeObject(Utils.join(Dog.DOG_FOLDER, this.name), this);
     }
 
     @Override
