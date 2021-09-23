@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 
 import static gitlet.Utils.*;
 
@@ -25,17 +26,25 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-
+    // The staging area: contains only one file at a time
+    public static final File STAGING_AREA = join(GITLET_DIR, "staging");
     /* TODO: fill in the rest of this class. */
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
             try {
                 GITLET_DIR.mkdir();
-            } catch (GitletException ex) {
+                STAGING_AREA.createNewFile();
+            } catch (GitletException | IOException ex) {
                 ex.getMessage();
             }
         }
-        Commit firstCommit = new Commit();
+        // make first commit
+        // Commit firstCommit = new Commit();
+        // put in commitTree from commit class: Utils.sha1(firstCommit);
+
+
     }
+
+
 }

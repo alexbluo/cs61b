@@ -1,8 +1,10 @@
 package gitlet;
 
 // TODO: any imports you need here
-
+import java.io.*;
 import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.*;
+
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -23,9 +25,19 @@ public class Commit {
     private String message;
     // Date of commit.
     private Date date;
+    // Tree of commits mapping sha1 to commits
+    // figure out how to store commits + blobs, prob have to use date instead or maybe not even a tree
+    private static TreeMap<String, Commit> commitMap;
 
-    public void Commit() {
+    public void Commit(String m, Date d, ) {
 
+    }
+    public static void add(File file) {
+        if (!file.exists()) {
+            System.out.println("File does not exist");
+            System.exit(0);
+        }
+        Utils.writeContents(Repository.STAGING_AREA, Utils.sha1(file));
 
     }
     /* TODO: fill in the rest of this class. */
