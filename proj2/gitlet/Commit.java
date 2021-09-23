@@ -29,8 +29,12 @@ public class Commit {
     // figure out how to store commits + blobs, prob have to use date instead or maybe not even a tree
     private static TreeMap<String, Commit> commitMap;
 
-    public void Commit(String m, Date d, ) {
+    public void Commit(String m, Date d, LinkedList<File> blobs) {
+        message = m;
+        date = d;
+        for (blob : blobs) {
 
+        }
     }
     public static void add(File file) {
         if (!file.exists()) {
@@ -41,4 +45,5 @@ public class Commit {
 
     }
     /* TODO: fill in the rest of this class. */
+
 }

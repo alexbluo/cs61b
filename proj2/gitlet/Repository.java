@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -40,7 +41,11 @@ public class Repository {
             }
         }
         // make first commit
-        // Commit firstCommit = new Commit();
+        Date defaultDate = new Date();
+        defaultDate.setTime(0);
+        LinkedList<File> defaultFile = new LinkedList<>();
+        defaultFile.add()
+        Commit firstCommit = new Commit("initial commit", defaultDate, );
         // put in commitTree from commit class: Utils.sha1(firstCommit);
 
 
