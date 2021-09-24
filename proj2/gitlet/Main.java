@@ -30,7 +30,7 @@ public class Main {
                     System.out.print("Incorrect operands.");
                     System.exit(0);
                 }
-                Commit.add(Utils.join(Repository.CWD, args[1]));
+                Repository.add(Utils.join(Repository.CWD, args[1]));
                 break;
             // TODO: FILL THE REST IN
             default:

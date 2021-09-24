@@ -1,6 +1,8 @@
 package gitlet;
 
 // TODO: any imports you need here
+import jdk.jshell.execution.Util;
+
 import java.io.*;
 import java.util.Date; // TODO: You'll likely use this in this class
 import java.util.*;
@@ -25,25 +27,27 @@ public class Commit {
     private String message;
     // Date of commit.
     private Date date;
-    // Tree of commits mapping sha1 to commits
-    // figure out how to store commits + blobs, prob have to use date instead or maybe not even a tree
-    private static TreeMap<String, Commit> commitMap;
+    // HashMap of all blobs that the commit tracks
+    private HashMap<String, File> blobs = new HashMap<>();
+    // Head pointer
+    private static Commit head = null;
+    // Parents of this commit, transient is so that the commit it points to isn't also serialized or read
+    private transient Commit parent1 = null;
+    // second parent for merges
+    private transient Commit parent2 = null;
 
-    public void Commit(String m, Date d, LinkedList<File> blobs) {
+    public void Commit(String m, Date d, HashMap<String, File> files) {
         message = m;
         date = d;
-        for (blob : blobs) {
-
+        for (File file : blobs.values()) {
+            this.blobs.put(Utils.sha1(file), file);
         }
     }
-    public static void add(File file) {
-        if (!file.exists()) {
-            System.out.println("File does not exist");
-            System.exit(0);
-        }
-        Utils.writeContents(Repository.STAGING_AREA, Utils.sha1(file));
+
+    public static void commit() {
 
     }
+
     /* TODO: fill in the rest of this class. */
 
 }

@@ -30,24 +30,35 @@ public class Repository {
     // The staging area: contains only one file at a time
     public static final File STAGING_AREA = join(GITLET_DIR, "staging");
     /* TODO: fill in the rest of this class. */
+    private HashMap<String, File> stagingArea = new HashMap<>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
             try {
                 GITLET_DIR.mkdir();
                 STAGING_AREA.createNewFile();
+                
+                Date defaultDate = new Date();
+                defaultDate.setTime(0);
+                Commit firstCommit = new Commit("initial commit", defaultDate, stagingArea);
             } catch (GitletException | IOException ex) {
                 ex.getMessage();
             }
         }
         // make first commit
-        Date defaultDate = new Date();
-        defaultDate.setTime(0);
-        LinkedList<File> defaultFile = new LinkedList<>();
-        defaultFile.add()
-        Commit firstCommit = new Commit("initial commit", defaultDate, );
+
         // put in commitTree from commit class: Utils.sha1(firstCommit);
 
+
+    }
+
+    public static void add(File file) {
+        if (!file.exists()) {
+            System.out.println("File does not exist");
+            System.exit(0);
+        }
+        stagingArea.put(Utils.sha1(file), file);
+        Utils.writeContents(STAGING_AREA, Utils.sha1(file));
 
     }
 
