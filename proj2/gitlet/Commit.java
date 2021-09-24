@@ -58,7 +58,6 @@ public class Commit implements Serializable {
         } catch (GitletException | IOException ex) {
             System.out.println(ex.getMessage());
         }
-
     }
 
 

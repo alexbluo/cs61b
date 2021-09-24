@@ -39,18 +39,15 @@ public class Repository {
             try {
                 GITLET_DIR.mkdir();
                 STAGING_AREA.mkdir();
-
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
-                File defaultFile = join(STAGING_AREA, "init");
-                stagingArea.put(Utils.sha1(defaultFile), defaultFile);
                 Commit firstCommit = new Commit("initial commit", defaultDate, stagingArea);
             } catch (GitletException ex) {
                 System.out.println(ex.getMessage());
             }
+        } else {
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
-
-
     }
 
     public static void add(File file) {
@@ -58,30 +55,23 @@ public class Repository {
             System.out.println("File does not exist");
             System.exit(0);
         }
-        boolean regular = true;
-        // NOT CHECKED OVER, LOOK CAREFULLY ALSO LOOK TIME COMPLEXITY
-        for (String fileHash : Commit.head.blobs.keySet()) {
-            if (fileHash.equals(Utils.sha1(file))) {
-                regular = false;
-                if (stagingArea.containsKey(Utils.sha1(file))) {
-                    stagingArea.remove(fileHash);
-
-                }
+        if (Commit.head.blobs.containsKey(Utils.sha1(file))) {
+            if (stagingArea.containsKey(Utils.sha1(file))) {
+                stagingArea.remove(Utils.sha1(file));
             }
-        }
-        for (String fileHash : stagingArea.keySet()) {
-            if (fileHash.equals(Utils.sha1(file))) {
-                regular = false;
-                File newFile = Utils.join(STAGING_AREA, Utils.sha1(file));
-                Utils.writeContents(newFile, Utils.sha1(file));
-            }
-        }
-        if (regular) {
+        } else if (stagingArea.containsValue(file)) {
             File newFile = Utils.join(STAGING_AREA, Utils.sha1(file));
+            Utils.writeContents(newFile, Utils.sha1(file));
+        } else {
+            File newFile = Utils.join(STAGING_AREA, Utils.sha1(file));
+            try {
+                newFile.createNewFile();
+            } catch (GitletException | IOException ex) {
+                System.out.println(ex.getMessage());
+            }
             stagingArea.put(Utils.sha1(file), file);
             Utils.writeContents(newFile, Utils.sha1(file));
         }
-
     }
 
 
