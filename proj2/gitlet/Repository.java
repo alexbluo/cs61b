@@ -27,27 +27,28 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    // The staging area: contains only one file at a time
+    // The staging area: should clear after each
     public static final File STAGING_AREA = join(GITLET_DIR, "staging");
-    /* TODO: fill in the rest of this class. */
-    private HashMap<String, File> stagingArea = new HashMap<>();
+    // Directory to store commits
+    public static final File COMMIT_DIR = join(GITLET_DIR, "commits");
+    // HashMap of everything in staging area currently
+    protected static HashMap<String, File> stagingArea = new HashMap<>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
             try {
                 GITLET_DIR.mkdir();
-                STAGING_AREA.createNewFile();
-                
+                STAGING_AREA.mkdir();
+
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
+                File defaultFile = join(STAGING_AREA, "init");
+                stagingArea.put(Utils.sha1(defaultFile), defaultFile);
                 Commit firstCommit = new Commit("initial commit", defaultDate, stagingArea);
-            } catch (GitletException | IOException ex) {
-                ex.getMessage();
+            } catch (GitletException ex) {
+                System.out.println(ex.getMessage());
             }
         }
-        // make first commit
-
-        // put in commitTree from commit class: Utils.sha1(firstCommit);
 
 
     }
@@ -57,8 +58,29 @@ public class Repository {
             System.out.println("File does not exist");
             System.exit(0);
         }
-        stagingArea.put(Utils.sha1(file), file);
-        Utils.writeContents(STAGING_AREA, Utils.sha1(file));
+        boolean regular = true;
+        // NOT CHECKED OVER, LOOK CAREFULLY ALSO LOOK TIME COMPLEXITY
+        for (String fileHash : Commit.head.blobs.keySet()) {
+            if (fileHash.equals(Utils.sha1(file))) {
+                regular = false;
+                if (stagingArea.containsKey(Utils.sha1(file))) {
+                    stagingArea.remove(fileHash);
+
+                }
+            }
+        }
+        for (String fileHash : stagingArea.keySet()) {
+            if (fileHash.equals(Utils.sha1(file))) {
+                regular = false;
+                File newFile = Utils.join(STAGING_AREA, Utils.sha1(file));
+                Utils.writeContents(newFile, Utils.sha1(file));
+            }
+        }
+        if (regular) {
+            File newFile = Utils.join(STAGING_AREA, Utils.sha1(file));
+            stagingArea.put(Utils.sha1(file), file);
+            Utils.writeContents(newFile, Utils.sha1(file));
+        }
 
     }
 

@@ -14,7 +14,7 @@ import java.util.*;
  *
  *  @author TODO
  */
-public class Commit {
+public class Commit implements Serializable {
     /**
      * TODO: add instance variables here.
      *
@@ -22,32 +22,44 @@ public class Commit {
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
-
+    // Persistence of commit info
+    protected File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1(this));
     /** The message of this Commit. */
     private String message;
     // Date of commit.
     private Date date;
     // HashMap of all blobs that the commit tracks
-    private HashMap<String, File> blobs = new HashMap<>();
-    // Head pointer
-    private static Commit head = null;
+    protected HashMap<String, File> blobs = new HashMap<>();
+    // Master branch
+    private Commit branch = this;
+    // Head pointer MIGHT NOT NEED STATIC**
+    protected static Commit head = null;
     // Parents of this commit, transient is so that the commit it points to isn't also serialized or read
-    private transient Commit parent1 = null;
+    private transient Commit parent1;
     // second parent for merges
-    private transient Commit parent2 = null;
+    private transient Commit parent2;
 
-    public void Commit(String m, Date d, HashMap<String, File> files) {
+    public Commit(String m, Date d, HashMap<String, File> files) {
         message = m;
         date = d;
-        for (File file : blobs.values()) {
+        for (File file : files.values()) {
             this.blobs.put(Utils.sha1(file), file);
         }
+        parent1 = head;
+        head = this;
+
+        // clear staging area file as well as HashMap
+
+
+        // persist, keep at end
+        try {
+            Utils.writeObject(commitPersist, this);
+            commitPersist.createNewFile();
+        } catch (GitletException | IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+
     }
 
-    public static void commit() {
-
-    }
-
-    /* TODO: fill in the rest of this class. */
 
 }

@@ -3,6 +3,7 @@ package gitlet;
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
  */
+import java.util.*;
 public class Main {
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
@@ -23,6 +24,7 @@ public class Main {
                     System.exit(0);
                 }
                 Repository.init();
+                // doc...
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command
@@ -31,8 +33,16 @@ public class Main {
                     System.exit(0);
                 }
                 Repository.add(Utils.join(Repository.CWD, args[1]));
+                // doc...
                 break;
             // TODO: FILL THE REST IN
+            case "commit":
+                if (args.length != 2) {
+                    System.out.print("Please enter a commit message");
+                    System.exit(0);
+                }
+                Commit newCommit = new Commit(args[1], new Date(), Repository.stagingArea);
+                // doc...
             default:
                 System.out.println("No command with that name exists.");
         }
