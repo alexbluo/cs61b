@@ -23,7 +23,7 @@ public class Commit implements Serializable {
      * variable is used. We've provided one example for `message`.
      */
     // Persistence of commit info
-    protected File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1(this));
+    protected File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
     /** The message of this Commit. */
     private String message;
     // Date of commit.
@@ -43,19 +43,28 @@ public class Commit implements Serializable {
         message = m;
         date = d;
         for (File file : files.values()) {
-            this.blobs.put(Utils.sha1(file), file);
+            this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
         }
         parent1 = head;
         head = this;
 
         // clear staging area file as well as HashMap
+        try {
+            for (File file : Repository.STAGING_AREA.listFiles()) {
+                file.delete();
+            }
+        } catch (NullPointerException ex){
 
+        }
+        Repository.stagingArea.clear();
 
         // persist, keep at end
         try {
-            Utils.writeObject(commitPersist, this);
             commitPersist.createNewFile();
+            Utils.writeObject(commitPersist, this);
+
         } catch (GitletException | IOException ex) {
+            System.out.println("failure");
             System.out.println(ex.getMessage());
         }
     }

@@ -19,10 +19,11 @@ public class Main {
         switch(firstArg) {
             case "init":
                 // TODO: handle the `init` command
-                if (args.length != 2) {
+                if (args.length != 1) {
                     System.out.print("Incorrect operands.");
                     System.exit(0);
                 }
+                Repository.test();
                 Repository.init();
                 // doc...
                 break;

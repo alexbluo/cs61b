@@ -39,6 +39,7 @@ public class Repository {
             try {
                 GITLET_DIR.mkdir();
                 STAGING_AREA.mkdir();
+                COMMIT_DIR.mkdir();
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
                 Commit firstCommit = new Commit("initial commit", defaultDate, stagingArea);
@@ -49,28 +50,33 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
-
+    public static void test() {
+        File testFile = join(STAGING_AREA, "lol");
+        System.out.println(Utils.sha1((Object) Utils.serialize(testFile)));
+    }
     public static void add(File file) {
+        CWD.
         if (!file.exists()) {
             System.out.println("File does not exist");
             System.exit(0);
         }
-        if (Commit.head.blobs.containsKey(Utils.sha1(file))) {
-            if (stagingArea.containsKey(Utils.sha1(file))) {
-                stagingArea.remove(Utils.sha1(file));
+        String stringf = Utils.sha1((Object) Utils.serialize(file));
+        if (Commit.head.blobs.containsKey(stringf)) {
+            if (stagingArea.containsKey(stringf)) {
+                stagingArea.remove(stringf);
             }
         } else if (stagingArea.containsValue(file)) {
-            File newFile = Utils.join(STAGING_AREA, Utils.sha1(file));
-            Utils.writeContents(newFile, Utils.sha1(file));
+            File newFile = Utils.join(STAGING_AREA, stringf);
+            Utils.writeContents(newFile, stringf);
         } else {
-            File newFile = Utils.join(STAGING_AREA, Utils.sha1(file));
+            File newFile = Utils.join(STAGING_AREA, stringf);
             try {
                 newFile.createNewFile();
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }
-            stagingArea.put(Utils.sha1(file), file);
-            Utils.writeContents(newFile, Utils.sha1(file));
+            stagingArea.put(stringf, file);
+            Utils.writeContents(newFile, stringf);
         }
     }
 
