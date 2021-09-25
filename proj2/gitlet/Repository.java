@@ -55,13 +55,13 @@ public class Repository {
         System.out.println(Utils.sha1((Object) Utils.serialize(testFile)));
     }
     public static void add(File file) {
-        CWD.
-        if (!file.exists()) {
+        if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
             System.exit(0);
         }
         String stringf = Utils.sha1((Object) Utils.serialize(file));
-        if (Commit.head.blobs.containsKey(stringf)) {
+        // here not reading Commit from a file, get rid of local HashMaps entirely and use Utils.plainFileNamesIn instead bruh
+        if (/*Utils.readObject()*/Commit.head.blobs.containsKey(stringf)) {
             if (stagingArea.containsKey(stringf)) {
                 stagingArea.remove(stringf);
             }
