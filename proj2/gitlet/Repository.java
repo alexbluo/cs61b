@@ -31,6 +31,8 @@ public class Repository {
     public static final File STAGING_AREA = join(GITLET_DIR, "staging");
     // Directory to store commits
     public static final File COMMIT_DIR = join(GITLET_DIR, "commits");
+    // Branch and head singletons
+    public static final File SINGLETONS = join(COMMIT_DIR, "singletons");
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -38,10 +40,11 @@ public class Repository {
                 GITLET_DIR.mkdir();
                 STAGING_AREA.mkdir();
                 COMMIT_DIR.mkdir();
+                SINGLETONS.createNewFile();
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
                 Commit firstCommit = new Commit("initial commit", defaultDate);
-            } catch (GitletException ex) {
+            } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }
         } else {
@@ -57,8 +60,7 @@ public class Repository {
             System.exit(0);
         }
         String stringf = Utils.sha1((Object) Utils.serialize(file));
-        //Utils.readObject(Objects.requireNonNull(COMMIT_DIR.listFiles())[0], Commit.class);
-        if (head**.blobs.containsKey(stringf)) {
+        if (Singleton.head.blobs.containsKey(stringf)) {
             for (File stFile : Objects.requireNonNull(STAGING_AREA.listFiles())) {
                 if (stringf.equals(Utils.sha1((Object) Utils.serialize(stFile)))) {
                     Utils.restrictedDelete(stFile);
@@ -77,7 +79,6 @@ public class Repository {
             }
             if (go) {
                 File newFile = Utils.join(STAGING_AREA, stringf);
-
                 try {
                     newFile.createNewFile();
                 } catch (GitletException | IOException ex) {
