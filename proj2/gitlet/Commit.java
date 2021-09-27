@@ -22,14 +22,14 @@ public class Commit implements Serializable {
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
-    // Persistence of commit info
-    protected File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
+    // Persistence of commit info NOT NEEDED OR EVEN EFFECTIVE GLOBALLY IG???
+    // protected File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
     /** The message of this Commit. */
-    private String message;
+    private final String message;
     // Date of commit.
-    private Date date;
+    private final Date date;
     // HashMap of all blobs that the commit tracks
-    protected HashMap<String, File> blobs = new HashMap<>();
+    protected TreeMap<String, File> blobs = new TreeMap<>();
     // Master branch
     private Commit branch = this;
     // Head pointer MIGHT NOT NEED STATIC**
@@ -39,28 +39,32 @@ public class Commit implements Serializable {
     // second parent for merges
     private transient Commit parent2;
 
-    public Commit(String m, Date d, HashMap<String, File> files) {
+    public Commit(String m, Date d) {
         message = m;
         date = d;
-        for (File file : files.values()) {
-            this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
+        if (/*can be problematic*/ head != null) {
+            for (File file : head.blobs.values()) {
+                this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
+            }
+        }
+        for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
+            if (!blobs.containsKey(Utils.sha1((Object) Utils.serialize(file)))) {
+                this.blobs.remove();
+                this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
+            }
         }
         parent1 = head;
         head = this;
-
         // clear staging area file as well as HashMap
-        try {
-            for (File file : Repository.STAGING_AREA.listFiles()) {
-                file.delete();
-            }
-        } catch (NullPointerException ex){
-
+        for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
+            file.delete();
         }
-        Repository.stagingArea.clear();
-
         // persist, keep at end
         try {
-            commitPersist.createNewFile();
+            //notcreating
+            File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
+            System.out.println(commitPersist);
+            System.out.println(commitPersist.createNewFile());
             Utils.writeObject(commitPersist, this);
 
         } catch (GitletException | IOException ex) {

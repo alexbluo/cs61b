@@ -31,8 +31,6 @@ public class Repository {
     public static final File STAGING_AREA = join(GITLET_DIR, "staging");
     // Directory to store commits
     public static final File COMMIT_DIR = join(GITLET_DIR, "commits");
-    // HashMap of everything in staging area currently
-    protected static HashMap<String, File> stagingArea = new HashMap<>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -42,7 +40,7 @@ public class Repository {
                 COMMIT_DIR.mkdir();
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
-                Commit firstCommit = new Commit("initial commit", defaultDate, stagingArea);
+                Commit firstCommit = new Commit("initial commit", defaultDate);
             } catch (GitletException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -51,8 +49,7 @@ public class Repository {
         }
     }
     public static void test() {
-        File testFile = join(STAGING_AREA, "lol");
-        System.out.println(Utils.sha1((Object) Utils.serialize(testFile)));
+
     }
     public static void add(File file) {
         if (!file.getAbsoluteFile().exists()) {
@@ -60,25 +57,34 @@ public class Repository {
             System.exit(0);
         }
         String stringf = Utils.sha1((Object) Utils.serialize(file));
-        // here not reading Commit from a file, get rid of local HashMaps entirely and use Utils.plainFileNamesIn instead bruh
-        if (/*Utils.readObject()*/Commit.head.blobs.containsKey(stringf)) {
-            if (stagingArea.containsKey(stringf)) {
-                stagingArea.remove(stringf);
+        //Utils.readObject(Objects.requireNonNull(COMMIT_DIR.listFiles())[0], Commit.class);
+        if (.blobs.containsKey(stringf)) {
+            for (File stFile : Objects.requireNonNull(STAGING_AREA.listFiles())) {
+                if (stringf.equals(Utils.sha1((Object) Utils.serialize(stFile)))) {
+                    Utils.restrictedDelete(stFile);
+                    break;
+                }
             }
-        } else if (stagingArea.containsValue(file)) {
-            File newFile = Utils.join(STAGING_AREA, stringf);
-            Utils.writeContents(newFile, stringf);
         } else {
-            File newFile = Utils.join(STAGING_AREA, stringf);
-            try {
-                newFile.createNewFile();
-            } catch (GitletException | IOException ex) {
-                System.out.println(ex.getMessage());
+            boolean go = true;
+            for (File stFile : Objects.requireNonNull(STAGING_AREA.listFiles())) {
+                if (file.equals(stFile)) {
+                    go = false;
+                    File newFile = Utils.join(STAGING_AREA, stringf);
+                    Utils.writeContents(newFile, file);
+                    break;
+                }
             }
-            stagingArea.put(stringf, file);
-            Utils.writeContents(newFile, stringf);
+            if (go) {
+                File newFile = Utils.join(STAGING_AREA, stringf);
+
+                try {
+                    newFile.createNewFile();
+                } catch (GitletException | IOException ex) {
+                    System.out.println(ex.getMessage());
+                }
+                Utils.writeContents(newFile, Utils.readContentsAsString(file));
+            }
         }
     }
-
-
 }

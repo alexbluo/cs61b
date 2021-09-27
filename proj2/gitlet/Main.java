@@ -36,16 +36,18 @@ public class Main {
                 Repository.add(Utils.join(Repository.CWD, args[1]));
                 // doc...
                 break;
-            // TODO: FILL THE REST IN
             case "commit":
                 if (args.length != 2) {
                     System.out.print("Please enter a commit message");
                     System.exit(0);
                 }
-                Commit newCommit = new Commit(args[1], new Date(), Repository.stagingArea);
+                Commit newCommit = new Commit(args[1], new Date());
+                break;
                 // doc...
             default:
                 System.out.println("No command with that name exists.");
+                System.out.println(args[0]);
+                break;
         }
     }
 }
