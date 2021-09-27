@@ -31,9 +31,9 @@ public class Commit implements Serializable {
     // HashMap of all blobs that the commit tracks
     protected TreeMap<String, File> blobs = new TreeMap<>();
     // Master branch
-    private Commit branch = this;
+    private static Commit branch; // need singletons??
     // Head pointer MIGHT NOT NEED STATIC**
-    protected static Commit head = null;
+    protected static Commit head;
     // Parents of this commit, transient is so that the commit it points to isn't also serialized or read
     private transient Commit parent1;
     // second parent for merges
@@ -42,26 +42,29 @@ public class Commit implements Serializable {
     public Commit(String m, Date d) {
         message = m;
         date = d;
-        if (/*can be problematic*/ head != null) {
+        //if (/*can be problematic*/ head != null) {
             for (File file : head.blobs.values()) {
                 this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
             }
-        }
+        //}
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
             if (!blobs.containsKey(Utils.sha1((Object) Utils.serialize(file)))) {
-                this.blobs.remove();
+                //abomination here
+                blobs.remove(Utils.sha1((Object) Utils.serialize(file)), file);
+                //????
+            } else {
                 this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
             }
         }
+        // doesnt work
         parent1 = head;
         head = this;
-        // clear staging area file as well as HashMap
+        // clear staging area dir
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
             file.delete();
         }
         // persist, keep at end
         try {
-            //notcreating
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
             System.out.println(commitPersist);
             System.out.println(commitPersist.createNewFile());

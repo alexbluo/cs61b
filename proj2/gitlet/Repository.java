@@ -58,7 +58,7 @@ public class Repository {
         }
         String stringf = Utils.sha1((Object) Utils.serialize(file));
         //Utils.readObject(Objects.requireNonNull(COMMIT_DIR.listFiles())[0], Commit.class);
-        if (.blobs.containsKey(stringf)) {
+        if (head**.blobs.containsKey(stringf)) {
             for (File stFile : Objects.requireNonNull(STAGING_AREA.listFiles())) {
                 if (stringf.equals(Utils.sha1((Object) Utils.serialize(stFile)))) {
                     Utils.restrictedDelete(stFile);
