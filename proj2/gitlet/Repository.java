@@ -31,8 +31,9 @@ public class Repository {
     public static final File STAGING_AREA = join(GITLET_DIR, "staging");
     // Directory to store commits
     public static final File COMMIT_DIR = join(GITLET_DIR, "commits");
-    // Branch and head singletons
-    public static final File SINGLETONS = join(COMMIT_DIR, "singletons");
+    // Branch and head files
+    public static final File HEAD = join(COMMIT_DIR, "head");
+    public static final File BRANCH = join(COMMIT_DIR, "branch");
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -40,7 +41,8 @@ public class Repository {
                 GITLET_DIR.mkdir();
                 STAGING_AREA.mkdir();
                 COMMIT_DIR.mkdir();
-                SINGLETONS.createNewFile();
+                HEAD.createNewFile();
+                BRANCH.createNewFile();
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
                 Commit firstCommit = new Commit("initial commit", defaultDate);

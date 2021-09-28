@@ -31,9 +31,9 @@ public class Commit implements Serializable {
     // TreeMap of all blobs that the commit tracks
     protected TreeMap<String, File> blobs = new TreeMap<>();
     // Master branch
-    // private static Commit branch; // need singletons??
+    private transient String branch;
     // Head pointer
-    // protected static Commit head;
+    private transient String head;
     // Parents of this commit, transient is so that the commit it points to isn't also serialized or read
     private transient Commit parent1;
     // second parent for merges
@@ -42,9 +42,14 @@ public class Commit implements Serializable {
     public Commit(String m, Date d) {
         message = m;
         date = d;
+        parent1 = Utils.readObject(Utils.join(Repository.CWD, Utils.readContentsAsString(Repository.HEAD)), Commit.class);
+        head = Utils.sha1(this);
+        //idek
+        branch = "master";
         // put all file hashes and files from head blobs into this blobs
         //(might need if rm the initial commit) if (head != null) {
-            for (File file : Singleton.head.blobs.values()) {
+            for (File file : parent1.blobs.values()) {
+                if (Repository.STAGING_AREA.)
                 this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
             }
         //}
@@ -65,9 +70,6 @@ public class Commit implements Serializable {
                 this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
             }
         }
-        // doesnt work lol
-        parent1 = Utils.readObject(Repository.SINGLETONS, ).head;
-        Singleton.head = this;
         // clear staging area dir
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
             file.delete();
@@ -76,7 +78,7 @@ public class Commit implements Serializable {
         try {
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
             System.out.println(commitPersist.createNewFile());
-            Utils.writeObject(Repository.SINGLETONS, new Singleton());
+            Utils.writeObject(Repository.HEAD, this.head);
             Utils.writeObject(commitPersist, this);
         } catch (GitletException | IOException ex) {
             System.out.println("failure");
