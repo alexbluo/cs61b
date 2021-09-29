@@ -55,6 +55,7 @@ public class Commit implements Serializable {
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
             if (blobs.containsKey(file) && !blobs.containsValue(Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))))) {
                 blobs.replace(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
+
             } else {
                 blobs.put(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
             }
@@ -66,7 +67,12 @@ public class Commit implements Serializable {
         // persist, keep at end
         try {
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
-            commitPersist.createNewFile();
+            commitPersist.mkdir();
+            for (File file : blobs.keySet()) {
+                File newFile = Utils.join(commitPersist, file);
+                newFile.createNewFile();
+                Utils.writeContents(newFile, Utils.readContentsAsString(file));
+            }
             Utils.writeObject(commitPersist, this);
             Utils.writeContents(Repository.BRANCH, this.branch);
             Utils.writeContents(Repository.HEAD, Utils.sha1((Object) Utils.serialize(this)));

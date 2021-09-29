@@ -54,6 +54,7 @@ public class Repository {
         }
     }
     public static void add(File file) {
+
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
             System.exit(0);
@@ -67,12 +68,13 @@ public class Repository {
         // if already in staging then overwrite with new content
         // else just add to staging area normally
         // not implemented - will no longer be staged for removal if it was at the time of command
-
+        //System.out.println(Utils.readContentsAsString(headCommit.blobs.);
         // SECOND ELSE PARAMETER SHOULD BE SAME AS RESTRDELETE PARAM, NEED WAY TO REPRESENT FILE PATHED FROM STAGING_AREA
         if (headCommit.blobs.containsValue(fileHash)) {
             //problem - cant path to staging area then file in order to check if file exists in staging area
-            Utils.restrictedDelete(/*same*/Utils.join(STAGING_AREA, fileHash));
-        } else if (/*same*/Utils.join(STAGING_AREA, fileHash).exists()) {
+            Utils.restrictedDelete(/*same*/Utils.join(STAGING_AREA, headCommit.blobs.get(file)));
+        } else if (/*same*/Utils.join(STAGING_AREA, headCommit.blobs.get(file)).exists()) {
+            headCommit.blobs.containsKey(file);
             File newFile = Utils.join(STAGING_AREA, fileHash);
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else {
@@ -84,38 +86,5 @@ public class Repository {
             }
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
         }
-
-        /*
-        if (Utils.readObject(Utils.join(Repository.CWD, Utils.readContentsAsString(Repository.HEAD)), Commit.class).blobs.containsKey(stringf)) {
-            for (File stFile : Objects.requireNonNull(STAGING_AREA.listFiles())) {
-                if (stringf.equals(Utils.sha1((Object) Utils.serialize(stFile)))) {
-                    Utils.restrictedDelete(stFile);
-                    break;
-                }
-            }
-        } else {
-            boolean go = true;
-            for (File stFile : Objects.requireNonNull(STAGING_AREA.listFiles())) {
-                if (file.equals(stFile)) {
-                    go = false;
-                    File newFile = Utils.join(STAGING_AREA, stringf);
-                    Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                    break;
-                }
-            }
-            if (go) {
-                File newFile = Utils.join(STAGING_AREA, stringf);
-                try {
-                    newFile.createNewFile();
-                } catch (GitletException | IOException ex) {
-                    System.out.println(ex.getMessage());
-                }
-                Utils.writeContents(newFile, Utils.readContentsAsString(file));
-            }
-
-
-        }
-
-         */
     }
 }
