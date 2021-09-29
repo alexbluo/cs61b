@@ -25,15 +25,13 @@ public class Commit implements Serializable {
     // Persistence of commit info NOT NEEDED OR EVEN EFFECTIVE GLOBALLY IG???
     // protected File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
     /** The message of this Commit. */
-    private final String message;
+    private String message;
     // Date of commit.
-    private final Date date;
-    // TreeMap of all blobs that the commit tracks
-    protected TreeMap<String, File> blobs = new TreeMap<>();
-    // Master branch
-    private transient String branch;
-    // Head pointer
-    private transient String head;
+    private Date date;
+    // TreeMap of all blobs that the commit tracks (need to distinguish between different versions without getting hash at runtime)
+    protected TreeMap<File, String> blobs = new TreeMap<>();
+    // Master branch not sure if needed/how to use yet
+    private String branch;
     // Parents of this commit, transient is so that the commit it points to isn't also serialized or read
     private transient Commit parent1;
     // second parent for merges
@@ -42,32 +40,23 @@ public class Commit implements Serializable {
     public Commit(String m, Date d) {
         message = m;
         date = d;
-        parent1 = Utils.readObject(Utils.join(Repository.CWD, Utils.readContentsAsString(Repository.HEAD)), Commit.class);
-        head = Utils.sha1(this);
-        //idek
+        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isFile()) {
+            parent1 = Utils.readObject(Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)), Commit.class);
+        }
+        //idek (yet)
         branch = "master";
         // put all file hashes and files from head blobs into this blobs
-        //(might need if rm the initial commit) if (head != null) {
-            for (File file : parent1.blobs.values()) {
-                if (Repository.STAGING_AREA.)
-                this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
-            }
-        //}
-        //remake of below
-        for (String fileHash : Objects.requireNonNull(Utils.plainFilenamesIn(Repository.STAGING_AREA))) {
-            if (!blobs.containsKey(fileHash) && blobs.containsValue(Utils.join(Repository.STAGING_AREA, fileHash))) {
-                blobs
+        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isFile()) {
+            for (File file : parent1.blobs.keySet()) {
+                blobs.put(file, parent1.blobs.get(file));
             }
         }
         // for each file in staging area, if this blobs does contain the file and does not contain that file's key then ???
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
-            if (blobs.containsValue(file) && !blobs.containsKey(Utils.sha1((Object) Utils.serialize(file)))) {
-                //abomination here
-                blobs.get(Utils.sha1(file));
-                blobs.remove(Utils.sha1((Object) Utils.serialize(file)), file);
-                //????
+            if (blobs.containsKey(file) && !blobs.containsValue(Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))))) {
+                blobs.replace(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
             } else {
-                this.blobs.put(Utils.sha1((Object) Utils.serialize(file)), file);
+                blobs.put(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
             }
         }
         // clear staging area dir
@@ -77,9 +66,10 @@ public class Commit implements Serializable {
         // persist, keep at end
         try {
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
-            System.out.println(commitPersist.createNewFile());
-            Utils.writeObject(Repository.HEAD, this.head);
+            commitPersist.createNewFile();
             Utils.writeObject(commitPersist, this);
+            Utils.writeContents(Repository.BRANCH, this.branch);
+            Utils.writeContents(Repository.HEAD, Utils.sha1((Object) Utils.serialize(this)));
         } catch (GitletException | IOException ex) {
             System.out.println("failure");
             System.out.println(ex.getMessage());

@@ -23,7 +23,6 @@ public class Main {
                     System.out.print("Incorrect operands.");
                     System.exit(0);
                 }
-                Repository.test();
                 Repository.init();
                 // doc...
                 break;
@@ -51,3 +50,4 @@ public class Main {
         }
     }
 }
+

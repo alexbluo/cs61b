@@ -32,8 +32,8 @@ public class Repository {
     // Directory to store commits
     public static final File COMMIT_DIR = join(GITLET_DIR, "commits");
     // Branch and head files
-    public static final File HEAD = join(COMMIT_DIR, "head");
-    public static final File BRANCH = join(COMMIT_DIR, "branch");
+    public static final File HEAD = join(GITLET_DIR, "head");
+    public static final File BRANCH = join(GITLET_DIR, "branch");
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -53,16 +53,40 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
-    public static void test() {
-
-    }
     public static void add(File file) {
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
             System.exit(0);
         }
-        String stringf = Utils.sha1((Object) Utils.serialize(file));
-        if (Singleton.head.blobs.containsKey(stringf)) {
+        // hash of file at the time
+        String fileHash = Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file)));
+        // head commit as object
+        Commit headCommit = Utils.readObject(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), Commit.class);
+        // if current working version of file is identical to the one in head commit do not stage, remove if already in staging
+        // (if head containsValue sha1(serialize this)
+        // if already in staging then overwrite with new content
+        // else just add to staging area normally
+        // not implemented - will no longer be staged for removal if it was at the time of command
+
+        // SECOND ELSE PARAMETER SHOULD BE SAME AS RESTRDELETE PARAM, NEED WAY TO REPRESENT FILE PATHED FROM STAGING_AREA
+        if (headCommit.blobs.containsValue(fileHash)) {
+            //problem - cant path to staging area then file in order to check if file exists in staging area
+            Utils.restrictedDelete(/*same*/Utils.join(STAGING_AREA, fileHash));
+        } else if (/*same*/Utils.join(STAGING_AREA, fileHash).exists()) {
+            File newFile = Utils.join(STAGING_AREA, fileHash);
+            Utils.writeContents(newFile, Utils.readContentsAsString(file));
+        } else {
+            File newFile = Utils.join(STAGING_AREA, fileHash);
+            try {
+                newFile.createNewFile();
+            } catch (GitletException | IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+            Utils.writeContents(newFile, Utils.readContentsAsString(file));
+        }
+
+        /*
+        if (Utils.readObject(Utils.join(Repository.CWD, Utils.readContentsAsString(Repository.HEAD)), Commit.class).blobs.containsKey(stringf)) {
             for (File stFile : Objects.requireNonNull(STAGING_AREA.listFiles())) {
                 if (stringf.equals(Utils.sha1((Object) Utils.serialize(stFile)))) {
                     Utils.restrictedDelete(stFile);
@@ -75,7 +99,7 @@ public class Repository {
                 if (file.equals(stFile)) {
                     go = false;
                     File newFile = Utils.join(STAGING_AREA, stringf);
-                    Utils.writeContents(newFile, file);
+                    Utils.writeContents(newFile, Utils.readContentsAsString(file));
                     break;
                 }
             }
@@ -88,6 +112,10 @@ public class Repository {
                 }
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
             }
+
+
         }
+
+         */
     }
 }
