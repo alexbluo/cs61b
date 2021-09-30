@@ -60,27 +60,28 @@ public class Commit implements Serializable {
                 blobs.put(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
             }
         }
-        // clear staging area dir
-        for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
-            file.delete();
-        }
+
+
         // persist, keep at end
         try {
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
             commitPersist.mkdir();
             for (File file : blobs.keySet()) {
-                File newFile = Utils.join(commitPersist, file);
+                File newFile = Utils.join(commitPersist, blobs.get(file));
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
             }
-            Utils.writeObject(commitPersist, this);
+            File info = Utils.join(commitPersist, "info");
+            Utils.writeObject(info, this);
             Utils.writeContents(Repository.BRANCH, this.branch);
             Utils.writeContents(Repository.HEAD, Utils.sha1((Object) Utils.serialize(this)));
         } catch (GitletException | IOException ex) {
             System.out.println("failure");
             System.out.println(ex.getMessage());
         }
+        // clear staging area dir
+        for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
+            file.delete();
+        }
     }
-
-
 }

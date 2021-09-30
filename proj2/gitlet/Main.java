@@ -3,6 +3,7 @@ package gitlet;
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
  */
+import java.io.File;
 import java.util.*;
 public class Main {
 
@@ -32,7 +33,7 @@ public class Main {
                     System.out.print("Incorrect operands.");
                     System.exit(0);
                 }
-                Repository.add(Utils.join(Repository.CWD, args[1]));
+                Repository.add(new File(args[1]));
                 // doc...
                 break;
             case "commit":
@@ -49,5 +50,6 @@ public class Main {
                 break;
         }
     }
+
 }
 
