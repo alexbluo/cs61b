@@ -1,3 +1,4 @@
+
 package gitlet;
 
 // TODO: any imports you need here
@@ -7,7 +8,7 @@ import java.io.*;
 import java.util.Date; // TODO: You'll likely use this in this class
 import java.util.*;
 
-// would need to remake the entire thing, its doomed
+
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
@@ -29,47 +30,55 @@ public class Commit implements Serializable {
     // Date of commit.
     private Date date;
     // TreeMap of all blobs that the commit tracks (need to distinguish between different versions without getting hash at runtime)
-    protected TreeMap<File, String> blobs = new TreeMap<>();
+    protected TreeMap<String, Blob> blobs = new TreeMap<>();
     // Master branch not sure if needed/how to use yet
     private String branch;
     // Parents of this commit, transient is so that the commit it points to isn't also serialized or read
-    private transient Commit parent1;
+    private String parent1;
     // second parent for merges
-    private transient Commit parent2;
+    private String parent2;
 
     public Commit(String m, Date d) {
         message = m;
         date = d;
-        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isFile()) {
-            parent1 = Utils.readObject(Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)), Commit.class);
+
+        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isDirectory()) {
+            parent1 = Utils.readContentsAsString(Repository.HEAD);
         }
+        System.out.println(parent1);
         //idek (yet)
         branch = "master";
-        // put all file hashes and files from head blobs into this blobs
-        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isFile()) {
-            for (File file : parent1.blobs.keySet()) {
-                blobs.put(file, parent1.blobs.get(file));
+        // copy blobs from parent
+        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isDirectory()) {
+            this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
+        }
+        //if parent contained the file
+        for (Blob blob : blobs.values()) {
+            if (Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs.blob.fileName) {
+
+            } else {
+                blobs.put()
             }
         }
-        // for each file in staging area, if this blobs does contain the file and does not contain that file's key then ???
-        for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
-            if (blobs.containsKey(file) && !blobs.containsValue(Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))))) {
+        //old, prob not too useful
+        /* for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
+            if (blobs.containsValue(file) && !blobs.containsValue(Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))))) {
                 blobs.replace(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
 
             } else {
                 blobs.put(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
             }
-        }
+        } */
 
 
         // persist, keep at end
         try {
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
             commitPersist.mkdir();
-            for (File file : blobs.keySet()) {
-                File newFile = Utils.join(commitPersist, blobs.get(file));
+            for (Blob blob : this.blobs.values()) {
+                File newFile = Utils.join(commitPersist, Utils.sha1(Utils.readContentsAsString(blob.file)));
                 newFile.createNewFile();
-                Utils.writeContents(newFile, Utils.readContentsAsString(file));
+                Utils.writeContents(newFile, Utils.readContentsAsString(blob.file));
             }
             File info = Utils.join(commitPersist, "info");
             Utils.writeObject(info, this);
@@ -83,5 +92,6 @@ public class Commit implements Serializable {
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
             file.delete();
         }
+        Repository.staging.clear();
     }
 }

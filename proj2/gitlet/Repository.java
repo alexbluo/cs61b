@@ -36,6 +36,9 @@ public class Repository {
     // Branch and head files
     public static final File HEAD = join(GITLET_DIR, "head");
     public static final File BRANCH = join(GITLET_DIR, "branch");
+    // HashMap of file name as inputted and actual file path so contents can be read
+    public static final File STAGING = join(STAGING_AREA, "staging");
+    protected static HashMap<String, File> staging = new HashMap<>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -45,6 +48,7 @@ public class Repository {
                 COMMIT_DIR.mkdir();
                 HEAD.createNewFile();
                 BRANCH.createNewFile();
+                STAGING.createNewFile();
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
                 Commit firstCommit = new Commit("initial commit", defaultDate);
@@ -56,7 +60,6 @@ public class Repository {
         }
     }
     public static void add(File file) {
-
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
             System.exit(0);
@@ -84,7 +87,6 @@ public class Repository {
         //    File newFile = Utils.join(STAGING_AREA, fileHash);
         //    Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else {
-
             File newFile = Utils.join(STAGING_AREA, fileHash);
             if (!file.exists()) {
                 try {
@@ -94,6 +96,8 @@ public class Repository {
                 }
             }
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
+            staging.put(file.toString(), newFile);
+            Utils.writeObject(STAGING, staging);
         }
     }
 }
