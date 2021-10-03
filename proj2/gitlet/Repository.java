@@ -39,7 +39,7 @@ public class Repository {
     public static final File BRANCH = join(GITLET_DIR, "branch");
     // HashMap of file name as inputted and actual file path so contents can be read
     public static File savestg = join(STAGING_AREA, "staging");
-    protected static LinkedList<Blob> staging = new LinkedList<>();
+    protected static LinkedList<Blob> staging = new LinkedList<Blob>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -69,7 +69,7 @@ public class Repository {
         // hash of file at the time
         String fileHash = Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file)));
         // head commit as object
-        //Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
+        Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
         // if current working version of file is identical to the one in head commit do not stage, remove if already in staging
         // (if head containsValue sha1(serialize this)
         // if already in staging then overwrite with new content
@@ -82,11 +82,11 @@ public class Repository {
             // head commit contains identical file then delete from staging area if already staged
             //Utils.join(STAGING_AREA, headCommit.blobs.conta).delete();
             // file already exists in staging then overwrite
-        /*} else if (Utils.join(STAGING_AREA, file.toString()).exists()) {
+        } else if (Utils.join(STAGING_AREA, file.toString()).exists()) {
             Utils.readObject(savestg, LinkedList.class).
             headCommit.blobs.containsKey(file);
             File newFile = Utils.join(STAGING_AREA, fileHash);
-            Utils.writeContents(newFile, Utils.readContentsAsString(file));*/
+            Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else {
             File newFile = Utils.join(STAGING_AREA, fileHash);
             try {
