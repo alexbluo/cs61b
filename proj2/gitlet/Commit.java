@@ -23,8 +23,6 @@ public class Commit implements Serializable {
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided one example for `message`.
      */
-    // Persistence of commit info NOT NEEDED OR EVEN EFFECTIVE GLOBALLY IG???
-    // protected File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
     /** The message of this Commit. */
     private String message;
     // Date of commit.
@@ -42,7 +40,7 @@ public class Commit implements Serializable {
         message = m;
         date = d;
 
-        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isDirectory()) {
+        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isFile()) {
             parent1 = Utils.readContentsAsString(Repository.HEAD);
         }
         System.out.println(parent1);
@@ -53,11 +51,11 @@ public class Commit implements Serializable {
             this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
         }
         //if parent contained the file
-        for (Blob blob : blobs.values()) {
-            if (Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs.blob.fileName) {
+        for (Blob blob : Utils.readObject(Repository.savestg, LinkedList.class)) {
+            if (false/*Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs.containsKey()*/) {
 
             } else {
-                blobs.put()
+                //blobs.put(Utils.sha1((Blob)blob., new Blob());
             }
         }
         //old, prob not too useful
@@ -76,9 +74,9 @@ public class Commit implements Serializable {
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
             commitPersist.mkdir();
             for (Blob blob : this.blobs.values()) {
-                File newFile = Utils.join(commitPersist, Utils.sha1(Utils.readContentsAsString(blob.file)));
+                File newFile = Utils.join(commitPersist, Utils.sha1(blob.getContents()));
                 newFile.createNewFile();
-                Utils.writeContents(newFile, Utils.readContentsAsString(blob.file));
+                Utils.writeContents(newFile, Utils.readContentsAsString(blob.getFile()));
             }
             File info = Utils.join(commitPersist, "info");
             Utils.writeObject(info, this);

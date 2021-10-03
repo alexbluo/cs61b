@@ -4,6 +4,7 @@ import edu.princeton.cs.algs4.ST;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 import static gitlet.Utils.*;
@@ -37,8 +38,8 @@ public class Repository {
     public static final File HEAD = join(GITLET_DIR, "head");
     public static final File BRANCH = join(GITLET_DIR, "branch");
     // HashMap of file name as inputted and actual file path so contents can be read
-    public static final File STAGING = join(STAGING_AREA, "staging");
-    protected static HashMap<String, File> staging = new HashMap<>();
+    public static File savestg = join(STAGING_AREA, "staging");
+    protected static LinkedList<Blob> staging = new LinkedList<>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -48,7 +49,7 @@ public class Repository {
                 COMMIT_DIR.mkdir();
                 HEAD.createNewFile();
                 BRANCH.createNewFile();
-                STAGING.createNewFile();
+                savestg.createNewFile();
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
                 Commit firstCommit = new Commit("initial commit", defaultDate);
@@ -60,6 +61,7 @@ public class Repository {
         }
     }
     public static void add(File file) {
+        System.out.println(Utils.readObject(savestg, LinkedList.class));
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
             System.exit(0);
@@ -67,37 +69,39 @@ public class Repository {
         // hash of file at the time
         String fileHash = Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file)));
         // head commit as object
-        Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
+        //Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
         // if current working version of file is identical to the one in head commit do not stage, remove if already in staging
         // (if head containsValue sha1(serialize this)
         // if already in staging then overwrite with new content
         // else just add to staging area normally
         // not implemented - will no longer be staged for removal if it was at the time of command
-        //System.out.println(Utils.readContentsAsString(headCommit.blobs.);
         // SECOND ELSE PARAMETER SHOULD BE SAME AS RESTRDELETE PARAM, NEED WAY TO REPRESENT FILE PATHED FROM STAGING_AREA
-        if (headCommit.blobs.containsValue(fileHash)) {
+        if (false/*headCommit.blobs.containsKey(file.toString())*/) {
             //problem - cant path to staging area then file in order to check if file exists in staging area
-            //File test = new File(STAGING_AREA +""+ file);
-            System.out.println(headCommit.blobs.get(Utils.join(STAGING_AREA, fileHash)));
-            System.out.println(Utils.join(STAGING_AREA, fileHash));
-            Utils.join(STAGING_AREA, fileHash).delete();
 
-        //} else if (/*same*/Utils.join(STAGING_AREA, headCommit.blobs.get(file)).exists()) {
-        //    headCommit.blobs.containsKey(file);
-        //    File newFile = Utils.join(STAGING_AREA, fileHash);
-        //    Utils.writeContents(newFile, Utils.readContentsAsString(file));
+            // head commit contains identical file then delete from staging area if already staged
+            //Utils.join(STAGING_AREA, headCommit.blobs.conta).delete();
+            // file already exists in staging then overwrite
+        /*} else if (Utils.join(STAGING_AREA, file.toString()).exists()) {
+            Utils.readObject(savestg, LinkedList.class).
+            headCommit.blobs.containsKey(file);
+            File newFile = Utils.join(STAGING_AREA, fileHash);
+            Utils.writeContents(newFile, Utils.readContentsAsString(file));*/
         } else {
             File newFile = Utils.join(STAGING_AREA, fileHash);
-            if (!file.exists()) {
-                try {
-                    newFile.createNewFile();
-                } catch (GitletException | IOException ex) {
-                    System.out.println(ex.getMessage());
-                }
+            try {
+                newFile.createNewFile();
+
+                Utils.writeContents(newFile, Utils.readContentsAsString(file));
+                staging.addLast(new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
+                PrintWriter writer = new PrintWriter(newFile);
+                writer.print("");
+                writer.close();
+                Utils.writeObject(savestg, staging);
+            } catch (GitletException | IOException ex) {
+                System.out.println(ex.getMessage());
             }
-            Utils.writeContents(newFile, Utils.readContentsAsString(file));
-            staging.put(file.toString(), newFile);
-            Utils.writeObject(STAGING, staging);
         }
+
     }
 }
