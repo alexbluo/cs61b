@@ -51,18 +51,17 @@ public class Commit implements Serializable {
             this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
         }
         //if parent contained the file
-        for (Blob blob : Utils.readObject(Repository.savestg, LinkedList.class)) {
+        // cant do for some reason ig
+        for (Blob blob : Utils.readObject(Repository.savestg, TreeMap.class).values()) {
             if (false/*Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs.containsKey()*/) {
-
+                (Blob) blob.getFile();
             } else {
                 //blobs.put(Utils.sha1((Blob)blob., new Blob());
             }
             // if(!blobs.containsKey(iteratedblob.getName()) {
             // add it (since add command already handles cases where the head commit already contains identical file}
         }
-        for (int i = 0; i < Utils.readObject(Repository.savestg, LinkedList.class).size(); i++) {
-            if ((Blob)Utils.readObject(Repository.savestg, LinkedList.class).get(i).)
-        }
+
         //old, prob not too useful
         /* for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
             if (blobs.containsValue(file) && !blobs.containsValue(Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))))) {

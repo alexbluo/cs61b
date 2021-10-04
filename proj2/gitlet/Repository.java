@@ -39,7 +39,7 @@ public class Repository {
     public static final File BRANCH = join(GITLET_DIR, "branch");
     // HashMap of file name as inputted and actual file path so contents can be read
     public static File savestg = join(STAGING_AREA, "staging");
-    protected static LinkedList<Blob> staging = new LinkedList<Blob>();
+    protected static TreeMap<String, Blob> staging = new TreeMap<>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -57,6 +57,7 @@ public class Repository {
                 System.out.println(ex.getMessage());
             }
         } else {
+
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
@@ -91,9 +92,8 @@ public class Repository {
             File newFile = Utils.join(STAGING_AREA, fileHash);
             try {
                 newFile.createNewFile();
-
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                staging.addLast(new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
+                staging.put(file.toString(), new Blob(newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(newFile);
                 writer.print("");
                 writer.close();
