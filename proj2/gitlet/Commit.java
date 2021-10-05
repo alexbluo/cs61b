@@ -54,13 +54,14 @@ public class Commit implements Serializable {
         //if parent contained the file
         //for each works, problem with readObject
         for (Blob blob : Repository.staging.values()) {
-            blob.getContents();
+            System.out.println(blob.getContents());
         }
-        for (Blob blob : Utils.readObject(Repository.savestg, TreeMap.class).values()) {
+        for (Object blob : (Utils.readObject(Repository.savestg, TreeMap.class).values())) {
             if (false/*Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs.containsKey()*/) {
-                (Blob) blob.getFile();
+                ((Blob) blob).getFile();
+                // who knows
             } else {
-                //blobs.put(Utils.sha1((Blob)blob., new Blob());
+                //blobs.put(Utils.s)ha1((Blob)blob., new Blob());
             }
             // if(!blobs.containsKey(iteratedblob.getName()) {
             // add it (since add command already handles cases where the head commit already contains identical file}

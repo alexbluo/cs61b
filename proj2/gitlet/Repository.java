@@ -62,7 +62,7 @@ public class Repository {
         }
     }
     public static void add(File file) {
-        System.out.println(Utils.readObject(savestg, LinkedList.class));
+        //System.out.println(Utils.readObject(savestg, LinkedList.class));
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
             System.exit(0);
@@ -70,7 +70,7 @@ public class Repository {
         // hash of file at the time
         String fileHash = Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file)));
         // head commit as object
-        Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
+        Commit headCommit = (Commit) (Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class));
         // if current working version of file is identical to the one in head commit do not stage, remove if already in staging
         // (if head containsValue sha1(serialize this)
         // if already in staging then overwrite with new content
@@ -88,7 +88,7 @@ public class Repository {
             // file already exists in staging then overwrite
         } else if (staging.containsKey(file.toString())) {
             // doesnt work here either
-            Utils.readObject(savestg, TreeMap.class);
+            //Utils.readObject(savestg, TreeMap.class);
             staging.replace(file.toString(), new Blob(file, Utils.readContentsAsString(file)));
             Utils.join(STAGING_AREA, Utils.sha1(staging.get(file.toString()).getContents())).delete();
             File newFile = Utils.join(STAGING_AREA, fileHash);
