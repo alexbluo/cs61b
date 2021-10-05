@@ -48,10 +48,14 @@ public class Commit implements Serializable {
         branch = "master";
         // copy blobs from parent
         if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isDirectory()) {
+            //here readObject doesnt work correctly either
             this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
         }
         //if parent contained the file
-        // cant do for some reason ig
+        //for each works, problem with readObject
+        for (Blob blob : Repository.staging.values()) {
+            blob.getContents();
+        }
         for (Blob blob : Utils.readObject(Repository.savestg, TreeMap.class).values()) {
             if (false/*Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs.containsKey()*/) {
                 (Blob) blob.getFile();

@@ -75,17 +75,22 @@ public class Repository {
         // (if head containsValue sha1(serialize this)
         // if already in staging then overwrite with new content
         // else just add to staging area normally
+        for (Blob blob : staging.values()) {
+            blob.getContents();
+        }
         // not implemented - will no longer be staged for removal if it was at the time of command
         // SECOND ELSE PARAMETER SHOULD BE SAME AS RESTRDELETE PARAM, NEED WAY TO REPRESENT FILE PATHED FROM STAGING_AREA
-        if (false/*headCommit.blobs.containsKey(file.toString())*/) {
+        if (headCommit.blobs.containsKey(file.toString())) {
             //problem - cant path to staging area then file in order to check if file exists in staging area
 
             // head commit contains identical file then delete from staging area if already staged
             //Utils.join(STAGING_AREA, headCommit.blobs.conta).delete();
             // file already exists in staging then overwrite
-        } else if (Utils.join(STAGING_AREA, file.toString()).exists()) {
-            Utils.readObject(savestg, LinkedList.class).
-            headCommit.blobs.containsKey(file);
+        } else if (staging.containsKey(file.toString())) {
+            // doesnt work here either
+            Utils.readObject(savestg, TreeMap.class);
+            staging.replace(file.toString(), new Blob(file, Utils.readContentsAsString(file)));
+            Utils.join(STAGING_AREA, Utils.sha1(staging.get(file.toString()).getContents())).delete();
             File newFile = Utils.join(STAGING_AREA, fileHash);
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else {
