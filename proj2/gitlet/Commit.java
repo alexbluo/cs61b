@@ -44,7 +44,7 @@ public class Commit implements Serializable {
         if (!Utils.readContentsAsString(Repository.HEAD).equals("")) {
             parent1 = Utils.readContentsAsString(Repository.HEAD);
 
-            this.blobs.putAll(((Commit)(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class))).blobs);
+            this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
         }
         if (!Utils.readContentsAsString(Repository.savestg).equals("")) {
             for (Object blob : Utils.readObject(Repository.savestg, TreeMap.class).values()) {
