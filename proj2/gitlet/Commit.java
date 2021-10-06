@@ -39,45 +39,25 @@ public class Commit implements Serializable {
     public Commit(String m, Date d) {
         message = m;
         date = d;
-
-        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isFile()) {
-            parent1 = Utils.readContentsAsString(Repository.HEAD);
-        }
-        System.out.println(parent1);
-        //idek (yet)
+        // who knows what im supposed to do here
         branch = "master";
-        // copy blobs from parent
-        if (Utils.join(Repository.COMMIT_DIR, Utils.readContentsAsString(Repository.HEAD)).isDirectory()) {
-            //here readObject doesnt work correctly either
-            this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
+        if (!Utils.readContentsAsString(Repository.HEAD).equals("")) {
+            parent1 = Utils.readContentsAsString(Repository.HEAD);
+
+            this.blobs.putAll(((Commit)(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class))).blobs);
         }
-        //if parent contained the file
-        //for each works, problem with readObject
-        for (Blob blob : Repository.staging.values()) {
-            System.out.println(blob.getContents());
-        }
-        for (Object blob : (Utils.readObject(Repository.savestg, TreeMap.class).values())) {
-            if (false/*Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs.containsKey()*/) {
-                ((Blob) blob).getFile();
-                // who knows
-            } else {
-                //blobs.put(Utils.s)ha1((Blob)blob., new Blob());
+        if (!Utils.readContentsAsString(Repository.savestg).equals("")) {
+            for (Object blob : Utils.readObject(Repository.savestg, TreeMap.class).values()) {
+                if (blobs.containsValue((Blob) blob)) {
+                    blobs.replace(((Blob) blob).getName(), ((Blob) blob));
+
+                } else {
+                    blobs.put(((Blob) blob).getName(), ((Blob) blob));
+                }
             }
-            // if(!blobs.containsKey(iteratedblob.getName()) {
-            // add it (since add command already handles cases where the head commit already contains identical file}
+        } else if (!Utils.readContentsAsString(Repository.HEAD).equals("")) {
+            System.out.println("No changes added to the commit");
         }
-
-        //old, prob not too useful
-        /* for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
-            if (blobs.containsValue(file) && !blobs.containsValue(Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))))) {
-                blobs.replace(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
-
-            } else {
-                blobs.put(file, Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file))));
-            }
-        } */
-
-
         // persist, keep at end
         try {
             File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
@@ -85,10 +65,10 @@ public class Commit implements Serializable {
             for (Blob blob : this.blobs.values()) {
                 File newFile = Utils.join(commitPersist, Utils.sha1(blob.getContents()));
                 newFile.createNewFile();
-                Utils.writeContents(newFile, Utils.readContentsAsString(blob.getFile()));
+                Utils.writeContents(newFile, blob.getContents());
             }
             File info = Utils.join(commitPersist, "info");
-            Utils.writeObject(info, this);
+            Utils.writeObject(info, Utils.serialize(this));
             Utils.writeContents(Repository.BRANCH, this.branch);
             Utils.writeContents(Repository.HEAD, Utils.sha1((Object) Utils.serialize(this)));
         } catch (GitletException | IOException ex) {
