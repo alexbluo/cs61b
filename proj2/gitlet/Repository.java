@@ -77,7 +77,7 @@ public class Repository {
         boolean go = true;
         // not implemented - will no longer be staged for removal if it was at the time of command
         // SECOND ELSE PARAMETER SHOULD BE SAME AS RESTRDELETE PARAM, NEED WAY TO REPRESENT FILE PATHED FROM STAGING_AREA
-        if (!Utils.readContentsAsString(HEAD).equals("")) {
+        /*if (!Utils.readContentsAsString(HEAD).equals("")) {
             Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
             for (Blob blob : headCommit.blobs.values()) {
                 if (Utils.sha1(blob.getContents()).equals(fileHash)) {
@@ -88,7 +88,7 @@ public class Repository {
 
                 }
             }
-        }
+        }*/
         /*if (go && staging.containsKey(file.toString())) {
 
             staging.replace(file.toString(), new Blob(file.toString(), file, Utils.readContentsAsString(file)));
@@ -101,9 +101,9 @@ public class Repository {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
                 staging.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
-                PrintWriter writer = new PrintWriter(savestg);
-                writer.print("");
-                writer.close();
+                //PrintWriter writer = new PrintWriter(savestg);
+                //writer.print("tfdsnfjksafjkn");
+                //writer.close();
                 Utils.writeObject(savestg, Utils.serialize(staging));
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
