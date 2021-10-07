@@ -77,10 +77,11 @@ public class Commit implements Serializable {
         }
         // clear staging area dir
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
-            if (file != Repository.stagingFile) {
+            if (!file.getAbsolutePath().equals(Repository.stagingFile.getAbsolutePath())) {
                 file.delete();
             }
         }
+        // NOT THIS WTIH CURRENT PUTALL IDEA (or prob not at all)
         Repository.stagingTree.clear();
     }
 }

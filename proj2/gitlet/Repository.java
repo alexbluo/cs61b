@@ -38,7 +38,7 @@ public class Repository {
     public static final File HEAD = join(GITLET_DIR, "head");
     public static final File BRANCH = join(GITLET_DIR, "branch");
     // HashMap of file name as inputted and actual file path so contents can be read
-    public static File stagingFile = join(STAGING_AREA, "staging");
+    public static final File stagingFile = join(STAGING_AREA, "staging");
     protected static TreeMap<String, Blob> stagingTree = new TreeMap<>();
 
     public static void init() {
@@ -100,7 +100,9 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                stagingTree.putAll(Utils.readObject(stagingFile, TreeMap.class));
+                stagingTree = Utils.readObject(stagingFile, TreeMap.class);
+                // readobject casts to regular treemap holding objects, need to hold extends K and V
+                stagingTree.putAll(((TreeMap<String, Blob>) (Utils.readObject(stagingFile, TreeMap.class))));
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
