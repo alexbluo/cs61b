@@ -38,8 +38,8 @@ public class Repository {
     public static final File HEAD = join(GITLET_DIR, "head");
     public static final File BRANCH = join(GITLET_DIR, "branch");
     // HashMap of file name as inputted and actual file path so contents can be read
-    public static File savestg = join(STAGING_AREA, "staging");
-    protected static TreeMap<String, Blob> staging = new TreeMap<>();
+    public static File stagingFile = join(STAGING_AREA, "staging");
+    protected static TreeMap<String, Blob> stagingTree = new TreeMap<>();
 
     public static void init() {
         if (!GITLET_DIR.exists()) {
@@ -49,7 +49,7 @@ public class Repository {
                 COMMIT_DIR.mkdir();
                 HEAD.createNewFile();
                 BRANCH.createNewFile();
-                savestg.createNewFile();
+                stagingFile.createNewFile();
                 Date defaultDate = new Date();
                 defaultDate.setTime(0);
                 Commit firstCommit = new Commit("initial commit", defaultDate);
@@ -89,10 +89,10 @@ public class Repository {
                 }
             }
         }
-        /*if (go && staging.containsKey(file.toString())) {
+        /*if (go && stagingTree.containsKey(file.toString())) {
 
-            staging.replace(file.toString(), new Blob(file.toString(), file, Utils.readContentsAsString(file)));
-            Utils.join(STAGING_AREA, Utils.sha1(((TreeMap<String, Blob>) Utils.readObject(savestg, TreeMap.class)).get(file.toString()).getContents())).delete();
+            stagingTree.replace(file.toString(), new Blob(file.toString(), file, Utils.readContentsAsString(file)));
+            Utils.join(STAGING_AREA, Utils.sha1(((TreeMap<String, Blob>) Utils.readObject(stagingFile, TreeMap.class)).get(file.toString()).getContents())).delete();
             File newFile = Utils.join(STAGING_AREA, fileHash);
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else */if (go) {
@@ -100,11 +100,12 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                staging.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
-                PrintWriter writer = new PrintWriter(savestg);
+                stagingTree.putAll(Utils.readObject(stagingFile, TreeMap.class));
+                stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
+                PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
                 writer.close();
-                Utils.writeObject(savestg, Utils.serialize(staging));
+                Utils.writeObject(stagingFile, stagingTree);
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }

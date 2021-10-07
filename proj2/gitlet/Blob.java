@@ -1,7 +1,6 @@
 package gitlet;
 import java.io.File;
 import java.io.Serializable;
-import java.util.*;
 
 public class Blob implements Serializable {
     private final String name;

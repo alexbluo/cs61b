@@ -46,8 +46,8 @@ public class Commit implements Serializable {
 
             this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
         }
-        if (!Utils.readContentsAsString(Repository.savestg).equals("")) {
-            for (Object blob : Utils.readObject(Repository.savestg, TreeMap.class).values()) {
+        if (!Utils.readContentsAsString(Repository.stagingFile).equals("")) {
+            for (Object blob : Utils.readObject(Repository.stagingFile, TreeMap.class).values()) {
                 if (blobs.containsValue((Blob) blob)) {
                     blobs.replace(((Blob) blob).getName(), ((Blob) blob));
 
@@ -68,7 +68,7 @@ public class Commit implements Serializable {
                 Utils.writeContents(newFile, blob.getContents());
             }
             File info = Utils.join(commitPersist, "info");
-            Utils.writeObject(info, Utils.serialize(this));
+            Utils.writeObject(info, this);
             Utils.writeContents(Repository.BRANCH, this.branch);
             Utils.writeContents(Repository.HEAD, Utils.sha1((Object) Utils.serialize(this)));
         } catch (GitletException | IOException ex) {
@@ -77,8 +77,10 @@ public class Commit implements Serializable {
         }
         // clear staging area dir
         for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
-            file.delete();
+            if (file != Repository.stagingFile) {
+                file.delete();
+            }
         }
-        Repository.staging.clear();
+        Repository.stagingTree.clear();
     }
 }
