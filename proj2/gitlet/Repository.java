@@ -114,7 +114,6 @@ public class Repository {
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }
-            HashMap test =
         }
 
     }
