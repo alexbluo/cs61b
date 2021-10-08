@@ -81,7 +81,5 @@ public class Commit implements Serializable {
                 file.delete();
             }
         }
-        // NOT THIS WTIH CURRENT PUTALL IDEA (or prob not at all)
-        Repository.stagingTree.clear();
     }
 }

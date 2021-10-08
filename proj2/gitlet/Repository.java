@@ -61,7 +61,7 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
-    @SuppressWarnings("unchecked")
+    //@SuppressWarnings("unchecked")
     public static void add(File file) {
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
@@ -76,8 +76,6 @@ public class Repository {
         // else just add to staging area normally
 
         boolean go = true;
-        // not implemented - will no longer be staged for removal if it was at the time of command
-        // SECOND ELSE PARAMETER SHOULD BE SAME AS RESTRDELETE PARAM, NEED WAY TO REPRESENT FILE PATHED FROM STAGING_AREA
         if (!Utils.readContentsAsString(HEAD).equals("")) {
             Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
             for (Blob blob : headCommit.blobs.values()) {
@@ -97,7 +95,7 @@ public class Repository {
             File newFile = Utils.join(STAGING_AREA, fileHash);
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else */if (go) {
-            //MIGHT HAVE TO MAKE NEWFILE THE ACTUAL ABSOLUTE PATH INSTEAD OF STAGING TO HASH LATER FOR CHECKOUT IDK
+            //MIGHT HAVE TO MAKE NEWFILE PATHTHE ACTUAL ABSOLUTE PATH INSTEAD OF STAGING/HASH LATER FOR CHECKOUT IDK
             File newFile = Utils.join(STAGING_AREA, fileHash);
             try {
                 newFile.createNewFile();
@@ -105,7 +103,7 @@ public class Repository {
                 //stagingTree = (TreeMap<String, Blob>) ((Utils.readObject(stagingFile, TreeMap.class)));
                 // readobject casts to regular treemap holding objects, need to hold extends K and V
 
-                stagingTree.putAll((TreeMap<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class)));
+                //stagingTree.putAll((TreeMap<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class)));
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
