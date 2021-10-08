@@ -29,9 +29,9 @@ public class Commit implements Serializable {
     private Date date;
     // TreeMap of all blobs that the commit tracks (need to distinguish between different versions without getting hash at runtime)
     protected TreeMap<String, Blob> blobs = new TreeMap<>();
-    // Master branch not sure if needed/how to use yet
+    // Branch not sure if needed/how to use yet, prob just write the branch to every commit but more complicated
     private String branch;
-    // Parents of this commit, transient is so that the commit it points to isn't also serialized or read
+    // Parents of this commit
     private String parent1;
     // second parent for merges
     private String parent2;

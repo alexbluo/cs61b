@@ -96,13 +96,14 @@ public class Repository {
             File newFile = Utils.join(STAGING_AREA, fileHash);
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else */if (go) {
+            //MIGHT HAVE TO MAKE NEWFILE THE ACTUAL ABSOLUTE PATH INSTEAD OF STAGING TO HASH LATER FOR CHECKOUT IDK
             File newFile = Utils.join(STAGING_AREA, fileHash);
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                stagingTree = Utils.readObject(stagingFile, TreeMap.class);
+                stagingTree = (TreeMap<String, Blob>) ((Utils.readObject(stagingFile, TreeMap.class)));
                 // readobject casts to regular treemap holding objects, need to hold extends K and V
-                stagingTree.putAll(((TreeMap<String, Blob>) (Utils.readObject(stagingFile, TreeMap.class))));
+                stagingTree.putAll(Utils.readObject(stagingFile, TreeMap.class));
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
