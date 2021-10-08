@@ -61,6 +61,7 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
+    @SuppressWarnings("unchecked")
     public static void add(File file) {
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
@@ -101,9 +102,10 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                stagingTree = (TreeMap<String, Blob>) ((Utils.readObject(stagingFile, TreeMap.class)));
+                //stagingTree = (TreeMap<String, Blob>) ((Utils.readObject(stagingFile, TreeMap.class)));
                 // readobject casts to regular treemap holding objects, need to hold extends K and V
-                stagingTree.putAll(Utils.readObject(stagingFile, TreeMap.class));
+
+                stagingTree.putAll((TreeMap<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class)));
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
@@ -112,6 +114,7 @@ public class Repository {
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }
+            HashMap test =
         }
 
     }
