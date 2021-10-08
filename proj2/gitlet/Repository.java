@@ -2,9 +2,7 @@ package gitlet;
 
 import edu.princeton.cs.algs4.ST;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 
 import static gitlet.Utils.*;
@@ -68,7 +66,7 @@ public class Repository {
             System.exit(0);
         }
         // hash of file at the time of add command
-        String fileHash = Utils.sha1((Object) Utils.serialize(Utils.readContentsAsString(file)));
+        String fileHash = Utils.sha1(Utils.readContentsAsString(file));
 
         // if current working version of file is identical to the one in head commit do not stage, remove if already in staging
         // (if head containsValue sha1(serialize this)
@@ -79,17 +77,18 @@ public class Repository {
         if (!Utils.readContentsAsString(HEAD).equals("")) {
             Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
             for (Blob blob : headCommit.blobs.values()) {
+                System.out.println(Utils.sha1(blob.getContents()).equals(fileHash));
                 if (Utils.sha1(blob.getContents()).equals(fileHash)) {
                     go = false;
                     if (Utils.join(STAGING_AREA, fileHash).isFile()) {
+                        // problem - literally just doesnt ever do this lmao
                         Utils.join(STAGING_AREA, fileHash).delete();
                     }
-
                 }
             }
         }
-        /*if (go && stagingTree.containsKey(file.toString())) {
-
+        /*if (go && Utils.readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
+            System.out.println("running 1");
             stagingTree.replace(file.toString(), new Blob(file.toString(), file, Utils.readContentsAsString(file)));
             Utils.join(STAGING_AREA, Utils.sha1(((TreeMap<String, Blob>) Utils.readObject(stagingFile, TreeMap.class)).get(file.toString()).getContents())).delete();
             File newFile = Utils.join(STAGING_AREA, fileHash);
@@ -100,8 +99,6 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                //stagingTree = (TreeMap<String, Blob>) ((Utils.readObject(stagingFile, TreeMap.class)));
-                // readobject casts to regular treemap holding objects, need to hold extends K and V
 
                 //stagingTree.putAll((TreeMap<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class)));
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
