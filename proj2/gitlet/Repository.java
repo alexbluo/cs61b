@@ -59,7 +59,7 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
-    //@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public static void add(File file) {
         if (!file.getAbsoluteFile().exists()) {
             System.out.println("File does not exist");
@@ -99,8 +99,8 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-
-                //stagingTree.putAll((TreeMap<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class)));
+                //???????????????????
+                stagingTree.putAll(((Map<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class))));
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
