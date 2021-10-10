@@ -94,13 +94,13 @@ public class Repository {
             File newFile = Utils.join(STAGING_AREA, fileHash);
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
         } else */if (go) {
-            //MIGHT HAVE TO MAKE NEWFILE PATHTHE ACTUAL ABSOLUTE PATH INSTEAD OF STAGING/HASH LATER FOR CHECKOUT IDK
+            //MIGHT HAVE TO MAKE NEWFILE PATH THE ACTUAL ABSOLUTE PATH INSTEAD OF STAGING/HASH LATER FOR CHECKOUT IDK
             File newFile = Utils.join(STAGING_AREA, fileHash);
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
                 //???????????????????
-                stagingTree.putAll(((Map<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class))));
+                //stagingTree.putAll(((Map<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class))));
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
