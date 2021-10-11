@@ -71,15 +71,19 @@ public class Commit implements Serializable {
             Utils.writeObject(info, this);
             Utils.writeContents(Repository.BRANCH, this.branch);
             Utils.writeContents(Repository.HEAD, Utils.sha1((Object) Utils.serialize(this)));
+
+            // clear staging area dir
+            for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
+                if (!file.getAbsolutePath().equals(Repository.stagingFile.getAbsolutePath())) {
+                    file.delete();
+                }
+            }
+            PrintWriter writer = new PrintWriter(Repository.stagingFile);
+            writer.print("");
+            writer.close();
         } catch (GitletException | IOException ex) {
             System.out.println("failure");
             System.out.println(ex.getMessage());
-        }
-        // clear staging area dir
-        for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
-            if (!file.getAbsolutePath().equals(Repository.stagingFile.getAbsolutePath())) {
-                file.delete();
-            }
         }
     }
 }

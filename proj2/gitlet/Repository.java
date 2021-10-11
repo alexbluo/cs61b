@@ -99,8 +99,10 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                //???????????????????
-                //stagingTree.putAll(((Map<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class))));
+                //??????????????????? why readobject error again
+                if (!((Map<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class))).isEmpty()) {
+                    stagingTree.putAll(((Map<String, Blob>)(Utils.readObject(stagingFile, TreeMap.class))));
+                }
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
