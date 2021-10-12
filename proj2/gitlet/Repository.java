@@ -75,31 +75,28 @@ public class Repository {
 
         boolean go = true;
         if (!Utils.readContentsAsString(HEAD).equals("")) {
-            Commit headCommit = Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class);
-            for (Blob blob : headCommit.blobs.values()) {
+            for (Blob blob : Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class).blobs.values()) {
                 System.out.println(Utils.sha1(blob.getContents()).equals(fileHash));
                 if (Utils.sha1(blob.getContents()).equals(fileHash)) {
                     go = false;
                     if (Utils.join(STAGING_AREA, fileHash).isFile()) {
-                        // problem - literally just doesnt ever do this lmao
+                        // problem - literally just doesnt ever do this probably
                         Utils.join(STAGING_AREA, fileHash).delete();
                     }
                 }
             }
         }
-        /*if (go && Utils.readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
-            System.out.println("running 1");
+        if ((go && !Utils.readContentsAsString(stagingFile).equals("")) && Utils.readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
             stagingTree.replace(file.toString(), new Blob(file.toString(), file, Utils.readContentsAsString(file)));
             Utils.join(STAGING_AREA, Utils.sha1(((TreeMap<String, Blob>) Utils.readObject(stagingFile, TreeMap.class)).get(file.toString()).getContents())).delete();
             File newFile = Utils.join(STAGING_AREA, fileHash);
             Utils.writeContents(newFile, Utils.readContentsAsString(file));
-        } else */if (go) {
+        } else if (go) {
             //MIGHT HAVE TO MAKE NEWFILE PATH THE ACTUAL ABSOLUTE PATH INSTEAD OF STAGING/HASH LATER FOR CHECKOUT IDK
             File newFile = Utils.join(STAGING_AREA, fileHash);
             try {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                //??????????????????? why readobject error again
                 if (!Utils.readContentsAsString(stagingFile).equals("")) {
                     stagingTree.putAll(Utils.readObject(stagingFile, TreeMap.class));
                 }
