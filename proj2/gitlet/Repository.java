@@ -100,11 +100,8 @@ public class Repository {
                 newFile.createNewFile();
                 Utils.writeContents(newFile, Utils.readContentsAsString(file));
                 //??????????????????? why readobject error again
-                if (!Utils.readObject(stagingFile, TreeMap.class).isEmpty()) {
+                if (!Utils.readContentsAsString(stagingFile).equals("")) {
                     stagingTree.putAll(Utils.readObject(stagingFile, TreeMap.class));
-                }
-                for (Object entry : Utils.readObject(stagingFile, TreeMap.class).entrySet()) {
-                    stagingTree.put(((Map.Entry<String, Blob>) entry).getKey(), ((Map.Entry<String, Blob>) entry).getValue());
                 }
                 stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
