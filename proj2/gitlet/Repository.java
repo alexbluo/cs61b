@@ -68,20 +68,16 @@ public class Repository {
         // hash of file at the time of add command
         String fileHash = Utils.sha1(Utils.readContentsAsString(file));
 
-        // if current working version of file is identical to the one in head commit do not stage, remove if already in staging
-        // (if head containsValue sha1(serialize this)
-        // if already in staging then overwrite with new content
-        // else just add to staging area normally
-
         boolean go = true;
         if (!Utils.readContentsAsString(HEAD).equals("")) {
             for (Blob blob : Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class).blobs.values()) {
                 System.out.println(Utils.sha1(blob.getContents()).equals(fileHash));
                 if (Utils.sha1(blob.getContents()).equals(fileHash)) {
                     go = false;
-                    if (Utils.join(STAGING_AREA, fileHash).isFile()) {
-                        // problem - literally just doesnt ever do this probably
-                        Utils.join(STAGING_AREA, fileHash).delete();
+                    for (Object blob2 : Utils.readObject(stagingFile, TreeMap.class).values()) {
+                        if (((Blob) blob2).getName().equals(blob.getName())) {
+                            Utils.join(STAGING_AREA, Utils.sha1(((Blob) blob2).getContents())).delete();
+                        }
                     }
                 }
             }
