@@ -44,6 +44,13 @@ public class Main {
                 Commit newCommit = new Commit(args[1], new Date());
                 break;
             // doc...
+            case "log":
+                if (args.length != 1) {
+                    System.out.print("Incorrect operands.");
+                    System.exit(0);
+                }
+                Doc.log();
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.out.println(args[0]);

@@ -24,17 +24,17 @@ public class Commit implements Serializable {
      * variable is used. We've provided one example for `message`.
      */
     /** The message of this Commit. */
-    private String message;
+    protected String message;
     // Date of commit.
-    private Date date;
+    protected Date date;
     // TreeMap of all blobs that the commit tracks (need to distinguish between different versions without getting hash at runtime)
     protected TreeMap<String, Blob> blobs = new TreeMap<>();
     // Branch not sure if needed/how to use yet, prob just write the branch to every commit but more complicated
     private String branch;
     // Parents of this commit
-    private String parent1;
+    protected String parent1;
     // second parent for merges
-    private String parent2;
+    protected String parent2;
 
     public Commit(String m, Date d) {
         message = m;
