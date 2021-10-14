@@ -36,6 +36,12 @@ public class Main {
                 Repository.add(new File(args[1]));
                 // doc...
                 break;
+            case "rm":
+                if (args.length != 2) {
+                    System.out.print("Incorrect operands.");
+                    System.exit(0);
+                }
+                Repository.rm(new File(args[1]));
             case "commit":
                 if (args.length != 2) {
                     System.out.print("Please enter a commit message");

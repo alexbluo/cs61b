@@ -59,6 +59,10 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
     }
+
+    // big mistake - made stagingTree track the file name and blob instead of hash of contents and blob
+    // too lazy to fix but makes some methods O(logn) instead of O(1) lol
+    // nvm fine ill fix it
     @SuppressWarnings("unchecked")
     public static void add(File file) {
         if (!file.getAbsoluteFile().exists()) {
@@ -66,46 +70,57 @@ public class Repository {
             System.exit(0);
         }
         // hash of file at the time of add command
-        String fileHash = Utils.sha1(Utils.readContentsAsString(file));
+        String fileHash = sha1(readContentsAsString(file));
 
         boolean go = true;
-        if (!Utils.readContentsAsString(HEAD).equals("")) {
-            for (Blob blob : Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class).blobs.values()) {
-                if (Utils.sha1(blob.getContents()).equals(fileHash)) {
+        if (!readContentsAsString(HEAD).equals("")) {
+            for (Blob blob : readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.values()) {
+                if (sha1(blob.getContents()).equals(fileHash)) {
                     go = false;
-                    if (!Utils.readContentsAsString(stagingFile).equals("")) {
-                        for (Object blob2 : Utils.readObject(stagingFile, TreeMap.class).values()) {
+                    if (!readContentsAsString(stagingFile).equals("")) {
+                        for (Object blob2 : readObject(stagingFile, TreeMap.class).values()) {
                             if (((Blob) blob2).getName().equals(blob.getName())) {
-                                Utils.join(STAGING_AREA, Utils.sha1(((Blob) blob2).getContents())).delete();
+                                join(STAGING_AREA, sha1(((Blob) blob2).getContents())).delete();
                             }
                         }
                     }
                 }
             }
         }
-        if ((go && !Utils.readContentsAsString(stagingFile).equals("")) && Utils.readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
-            stagingTree.replace(file.toString(), new Blob(file.toString(), file, Utils.readContentsAsString(file)));
-            Utils.join(STAGING_AREA, Utils.sha1(((TreeMap<String, Blob>) Utils.readObject(stagingFile, TreeMap.class)).get(file.toString()).getContents())).delete();
-            File newFile = Utils.join(STAGING_AREA, fileHash);
-            Utils.writeContents(newFile, Utils.readContentsAsString(file));
+        if ((go && !readContentsAsString(stagingFile).equals("")) && readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
+            stagingTree.replace(file.toString(), new Blob(file.toString(), file, readContentsAsString(file)));
+            join(STAGING_AREA, sha1(((TreeMap<String, Blob>) readObject(stagingFile, TreeMap.class)).get(file.toString()).getContents())).delete();
+            File newFile = join(STAGING_AREA, fileHash);
+            writeContents(newFile, readContentsAsString(file));
         } else if (go) {
             //MIGHT HAVE TO MAKE NEWFILE PATH THE ACTUAL ABSOLUTE PATH INSTEAD OF STAGING/HASH LATER FOR CHECKOUT IDK
-            File newFile = Utils.join(STAGING_AREA, fileHash);
+            File newFile = join(STAGING_AREA, fileHash);
             try {
                 newFile.createNewFile();
-                Utils.writeContents(newFile, Utils.readContentsAsString(file));
-                if (!Utils.readContentsAsString(stagingFile).equals("")) {
-                    stagingTree.putAll(Utils.readObject(stagingFile, TreeMap.class));
+                writeContents(newFile, readContentsAsString(file));
+                if (!readContentsAsString(stagingFile).equals("")) {
+                    stagingTree.putAll(readObject(stagingFile, TreeMap.class));
                 }
-                stagingTree.put(file.toString(), new Blob(file.toString(), newFile, Utils.readContentsAsString(file)));
+                stagingTree.put(file.toString(), new Blob(file.toString(), newFile, readContentsAsString(file)));
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
                 writer.close();
-                Utils.writeObject(stagingFile, stagingTree);
+                writeObject(stagingFile, stagingTree);
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }
         }
+    }
 
+    public static void rm(File file) {
+        try {
+            for (Object blob : readObject(stagingFile, TreeMap.class).values()) {
+                if (((Blob) blob).getName().equals(file.toString())) {
+                    join(STAGING_AREA, sha1(((Blob) blob).getContents())).delete();
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("No reason to remove the file.");
+        }
     }
 }

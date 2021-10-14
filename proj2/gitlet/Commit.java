@@ -5,6 +5,7 @@ package gitlet;
 import jdk.jshell.execution.Util;
 
 import java.io.*;
+import static gitlet.Utils.*;
 import java.util.Date; // TODO: You'll likely use this in this class
 import java.util.*;
 
@@ -41,12 +42,12 @@ public class Commit implements Serializable {
         date = d;
         // who knows what im supposed to do here
         branch = "master";
-        if (!Utils.readContentsAsString(Repository.HEAD).equals("")) {
-            parent1 = Utils.readContentsAsString(Repository.HEAD);
-            this.blobs.putAll(Utils.readObject(Utils.join(Utils.join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
+        if (!readContentsAsString(Repository.HEAD).equals("")) {
+            parent1 = readContentsAsString(Repository.HEAD);
+            this.blobs.putAll(readObject(join(join(Repository.COMMIT_DIR, parent1), "info"), Commit.class).blobs);
         }
-        if (!Utils.readContentsAsString(Repository.stagingFile).equals("")) {
-            for (Object blob : Utils.readObject(Repository.stagingFile, TreeMap.class).values()) {
+        if (!readContentsAsString(Repository.stagingFile).equals("")) {
+            for (Object blob : readObject(Repository.stagingFile, TreeMap.class).values()) {
                 if (blobs.containsValue((Blob) blob)) {
                     blobs.replace(((Blob) blob).getName(), ((Blob) blob));
 
@@ -54,22 +55,22 @@ public class Commit implements Serializable {
                     blobs.put(((Blob) blob).getName(), ((Blob) blob));
                 }
             }
-        } else if (!Utils.readContentsAsString(Repository.HEAD).equals("")) {
+        } else if (!readContentsAsString(Repository.HEAD).equals("")) {
             System.out.println("No changes added to the commit");
         }
         // persist, keep at end
         try {
-            File commitPersist = Utils.join(Repository.COMMIT_DIR, Utils.sha1((Object) Utils.serialize(this)));
+            File commitPersist = join(Repository.COMMIT_DIR, sha1((Object) serialize(this)));
             commitPersist.mkdir();
             for (Blob blob : this.blobs.values()) {
-                File newFile = Utils.join(commitPersist, Utils.sha1(blob.getContents()));
+                File newFile = join(commitPersist, sha1(blob.getContents()));
                 newFile.createNewFile();
-                Utils.writeContents(newFile, blob.getContents());
+                writeContents(newFile, blob.getContents());
             }
-            File info = Utils.join(commitPersist, "info");
-            Utils.writeObject(info, this);
-            Utils.writeContents(Repository.BRANCH, this.branch);
-            Utils.writeContents(Repository.HEAD, Utils.sha1((Object) Utils.serialize(this)));
+            File info = join(commitPersist, "info");
+            writeObject(info, this);
+            writeContents(Repository.BRANCH, this.branch);
+            writeContents(Repository.HEAD, sha1((Object) serialize(this)));
 
             // clear staging area dir
             for (File file : Objects.requireNonNull(Repository.STAGING_AREA.listFiles())) {
