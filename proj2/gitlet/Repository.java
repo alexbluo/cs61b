@@ -71,12 +71,13 @@ public class Repository {
         boolean go = true;
         if (!Utils.readContentsAsString(HEAD).equals("")) {
             for (Blob blob : Utils.readObject(Utils.join(Utils.join(COMMIT_DIR, Utils.readContentsAsString(HEAD)), "info"), Commit.class).blobs.values()) {
-                System.out.println(Utils.sha1(blob.getContents()).equals(fileHash));
                 if (Utils.sha1(blob.getContents()).equals(fileHash)) {
                     go = false;
-                    for (Object blob2 : Utils.readObject(stagingFile, TreeMap.class).values()) {
-                        if (((Blob) blob2).getName().equals(blob.getName())) {
-                            Utils.join(STAGING_AREA, Utils.sha1(((Blob) blob2).getContents())).delete();
+                    if (!Utils.readContentsAsString(stagingFile).equals("")) {
+                        for (Object blob2 : Utils.readObject(stagingFile, TreeMap.class).values()) {
+                            if (((Blob) blob2).getName().equals(blob.getName())) {
+                                Utils.join(STAGING_AREA, Utils.sha1(((Blob) blob2).getContents())).delete();
+                            }
                         }
                     }
                 }
