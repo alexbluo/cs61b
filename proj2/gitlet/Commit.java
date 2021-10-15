@@ -48,12 +48,7 @@ public class Commit implements Serializable {
         }
         if (!readContentsAsString(Repository.stagingFile).equals("")) {
             for (Object blob : readObject(Repository.stagingFile, TreeMap.class).values()) {
-                if (blobs.containsValue((Blob) blob)) {
-                    blobs.replace(((Blob) blob).getName(), ((Blob) blob));
-
-                } else {
-                    blobs.put(((Blob) blob).getName(), ((Blob) blob));
-                }
+                blobs.put(((Blob) blob).getName(), ((Blob) blob));
             }
         } else if (!readContentsAsString(Repository.HEAD).equals("")) {
             System.out.println("No changes added to the commit");

@@ -87,6 +87,7 @@ public class Repository {
                 }
             }
         }
+        //could def cut this down but im too lazy lol
         if ((go && !readContentsAsString(stagingFile).equals("")) && readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
             stagingTree.replace(file.toString(), new Blob(file.toString(), file, readContentsAsString(file)));
             join(STAGING_AREA, sha1(((TreeMap<String, Blob>) readObject(stagingFile, TreeMap.class)).get(file.toString()).getContents())).delete();
@@ -98,28 +99,40 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 writeContents(newFile, readContentsAsString(file));
-                if (!readContentsAsString(stagingFile).equals("")) {
-                    stagingTree.putAll(readObject(stagingFile, TreeMap.class));
-                }
-                stagingTree.put(file.toString(), new Blob(file.toString(), newFile, readContentsAsString(file)));
-                PrintWriter writer = new PrintWriter(stagingFile);
-                writer.print("");
-                writer.close();
-                writeObject(stagingFile, stagingTree);
+                    if (!readContentsAsString(stagingFile).equals("")) {
+                        stagingTree.putAll(readObject(stagingFile, TreeMap.class));
+                    }
+                    stagingTree.put(file.toString(), new Blob(file.toString(), newFile, readContentsAsString(file)));
+                    PrintWriter writer = new PrintWriter(stagingFile);
+                    writer.print("");
+                    writer.close();
+                    writeObject(stagingFile, stagingTree);
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }
         }
     }
-
+    //fix first lol
+    //actually not sure if needed, check first
+    @SuppressWarnings("unchecked")
     public static void rm(File file) {
         try {
             for (Object blob : readObject(stagingFile, TreeMap.class).values()) {
                 if (((Blob) blob).getName().equals(file.toString())) {
+                    //TODO: check over
+                    if (!readContentsAsString(stagingFile).equals("")) {
+                        stagingTree.putAll(readObject(stagingFile, TreeMap.class));
+                    }
+                    stagingTree.remove();
+                    PrintWriter writer = new PrintWriter(stagingFile);
+                    writer.print("");
+                    writer.close();
+                    writeObject(stagingFile, stagingTree);
+
                     join(STAGING_AREA, sha1(((Blob) blob).getContents())).delete();
                 }
             }
-        } catch (FileNotFoundException ex) {
+        } catch (Exception ex) {
             System.out.println("No reason to remove the file.");
         }
     }
