@@ -58,6 +58,14 @@ public class Main {
                 }
                 Doc.log();
                 break;
+            case "global-log":
+                if (args.length != 1) {
+                    System.out.print("Incorrect operands.");
+                    System.exit(0);
+                }
+                Doc.globalLog();
+                break;
+                // TODO: IN FUTURE: PLEASE BREAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             default:
                 System.out.println("No command with that name exists.");
                 System.out.println(args[0]);
