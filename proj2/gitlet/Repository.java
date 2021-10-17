@@ -73,16 +73,12 @@ public class Repository {
         String fileHash = sha1(readContentsAsString(file));
 
         boolean go = true;
-        if (!readContentsAsString(HEAD).equals("") /*&& sha1(((Blob) readObject(stagingFile, TreeMap.class).get(file.toString())).getContents()).eauals(fileHash)*/) {
-            for (Blob blob : readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.values()) {
-                if (sha1(blob.getContents()).equals(fileHash)) {
-                    go = false;
-                    if (!readContentsAsString(stagingFile).equals("")) {
-                        for (Object blob2 : readObject(stagingFile, TreeMap.class).values()) {
-                            if (((Blob) blob2).getName().equals(blob.getName())) {
-                                join(STAGING_AREA, sha1(((Blob) blob2).getContents())).delete();
-                            }
-                        }
+        if (!readContentsAsString(HEAD).equals("") && sha1(readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.get(file.toString()).getContents()).equals(fileHash)) {
+            go = false;
+            if (!readContentsAsString(stagingFile).equals("")) {
+                for (Object blob2 : readObject(stagingFile, TreeMap.class).values()) {
+                    if (((Blob) blob2).getName().equals(blob.getName())) {
+                        join(STAGING_AREA, sha1(((Blob) blob2).getContents())).delete();
                     }
                 }
             }
