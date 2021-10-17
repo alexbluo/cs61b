@@ -73,7 +73,7 @@ public class Repository {
         String fileHash = sha1(readContentsAsString(file));
 
         boolean go = true;
-        if (!readContentsAsString(HEAD).equals("")) {
+        if (!readContentsAsString(HEAD).equals("") /*&& sha1(((Blob) readObject(stagingFile, TreeMap.class).get(file.toString())).getContents()).eauals(fileHash)*/) {
             for (Blob blob : readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.values()) {
                 if (sha1(blob.getContents()).equals(fileHash)) {
                     go = false;
@@ -117,22 +117,22 @@ public class Repository {
     @SuppressWarnings("unchecked")
     public static void rm(File file) {
         try {
-            for (Object blob : readObject(stagingFile, TreeMap.class).values()) {
-                if (((Blob) blob).getName().equals(file.toString())) {
-                    //TODO: check over
-                    if (!readContentsAsString(stagingFile).equals("")) {
-                        stagingTree.putAll(readObject(stagingFile, TreeMap.class));
-                    }
-                    stagingTree.remove();
-                    PrintWriter writer = new PrintWriter(stagingFile);
-                    writer.print("");
-                    writer.close();
-                    writeObject(stagingFile, stagingTree);
-
-                    join(STAGING_AREA, sha1(((Blob) blob).getContents())).delete();
+            if (readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
+                if (!readContentsAsString(stagingFile).equals("")) {
+                    stagingTree.putAll(readObject(stagingFile, TreeMap.class));
                 }
+
+                // VERY IMPORTANT FOR OPTIMIZATION - REUSE IN OTHER PLACES
+                // path to actual file
+                join(STAGING_AREA, sha1(((Blob) readObject(stagingFile, TreeMap.class).get(file.toString())).getContents())).delete();
+
+                stagingTree.remove(file.toString());
+                PrintWriter writer = new PrintWriter(stagingFile);
+                writer.print("");
+                writer.close();
+                writeObject(stagingFile, stagingTree);
             }
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException | FileNotFoundException ex) {
             System.out.println("No reason to remove the file.");
         }
     }

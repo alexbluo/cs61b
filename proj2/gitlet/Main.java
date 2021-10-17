@@ -42,6 +42,7 @@ public class Main {
                     System.exit(0);
                 }
                 Repository.rm(new File(args[1]));
+                break;
             case "commit":
                 if (args.length != 2) {
                     System.out.print("Please enter a commit message");
@@ -64,3 +65,5 @@ public class Main {
         }
     }
 }
+
+//test

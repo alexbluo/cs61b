@@ -2,6 +2,7 @@ package gitlet;
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
 import java.util.*;
+import java.io.*;
 
 public class Doc {
     /* For methods like log, global log, find, and status
@@ -25,6 +26,15 @@ public class Doc {
             } catch (NullPointerException ex) {
                 pos = null;
             }
+        }
+    }
+
+    public static void globalLog() {
+        for (String dir : plainFilenamesIn(COMMIT_DIR)) {
+            System.out.println("===");
+            System.out.println(sha1((Object) serialize(join(dir, "info"))));
+            System.out.println(readObject(join(dir, "info"), Commit.class).date);
+            System.out.println(readObject(join(dir, "info"), Commit.class).message);
         }
     }
 }
