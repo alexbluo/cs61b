@@ -73,13 +73,18 @@ public class Repository {
         String fileHash = sha1(readContentsAsString(file));
 
         boolean go = true;
-        if (!readContentsAsString(HEAD).equals("") && sha1(readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.get(file.toString()).getContents()).equals(fileHash)) {
+        if (!readContentsAsString(HEAD).equals("") && readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.get(file.toString()) != null && sha1(readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.get(file.toString()).getContents()).equals(fileHash)) {
             go = false;
             if (!readContentsAsString(stagingFile).equals("")) {
-                for (Object blob2 : readObject(stagingFile, TreeMap.class).values()) {
-                    if (((Blob) blob2).getName().equals(blob.getName())) {
-                        join(STAGING_AREA, sha1(((Blob) blob2).getContents())).delete();
-                    }
+                join(STAGING_AREA, sha1(((Blob) readObject(stagingFile, TreeMap.class).get(file.toString())).getContents())).delete();
+                try {
+                    stagingTree.remove(file.toString());
+                    PrintWriter writer = new PrintWriter(stagingFile);
+                    writer.print("");
+                    writer.close();
+                    writeObject(stagingFile, stagingTree);
+                } catch(FileNotFoundException ex) {
+                    ex.printStackTrace();
                 }
             }
         }
@@ -95,14 +100,14 @@ public class Repository {
             try {
                 newFile.createNewFile();
                 writeContents(newFile, readContentsAsString(file));
-                    if (!readContentsAsString(stagingFile).equals("")) {
-                        stagingTree.putAll(readObject(stagingFile, TreeMap.class));
-                    }
-                    stagingTree.put(file.toString(), new Blob(file.toString(), newFile, readContentsAsString(file)));
-                    PrintWriter writer = new PrintWriter(stagingFile);
-                    writer.print("");
-                    writer.close();
-                    writeObject(stagingFile, stagingTree);
+                if (!readContentsAsString(stagingFile).equals("")) {
+                    stagingTree.putAll(readObject(stagingFile, TreeMap.class));
+                }
+                stagingTree.put(file.toString(), new Blob(file.toString(), newFile, readContentsAsString(file)));
+                PrintWriter writer = new PrintWriter(stagingFile);
+                writer.print("");
+                writer.close();
+                writeObject(stagingFile, stagingTree);
             } catch (GitletException | IOException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -117,16 +122,20 @@ public class Repository {
                 if (!readContentsAsString(stagingFile).equals("")) {
                     stagingTree.putAll(readObject(stagingFile, TreeMap.class));
                 }
-
                 // VERY IMPORTANT FOR OPTIMIZATION - REUSE IN OTHER PLACES
-                // path to actual file
+                // path to actual file in staging area
                 join(STAGING_AREA, sha1(((Blob) readObject(stagingFile, TreeMap.class).get(file.toString())).getContents())).delete();
-
                 stagingTree.remove(file.toString());
                 PrintWriter writer = new PrintWriter(stagingFile);
                 writer.print("");
                 writer.close();
                 writeObject(stagingFile, stagingTree);
+            }
+            if (readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.containsKey(file.toString()) && join(CWD, file.toString()).exists()) {
+                join(CWD, file.toString()).delete();
+            }
+            if (!readObject(stagingFile, TreeMap.class).containsKey(file.toString()) && !readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.containsKey(file.toString())) {
+                System.out.println("No reason to remove the file.");
             }
         } catch (IllegalArgumentException | FileNotFoundException ex) {
             System.out.println("No reason to remove the file.");

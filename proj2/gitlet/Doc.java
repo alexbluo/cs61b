@@ -30,11 +30,22 @@ public class Doc {
     }
 
     public static void globalLog() {
-        for (String dir : plainFilenamesIn(COMMIT_DIR)) {
+        for (String dir : listDirs(COMMIT_DIR)) {
             System.out.println("===");
-            System.out.println(sha1((Object) serialize(join(dir, "info"))));
-            System.out.println(readObject(join(dir, "info"), Commit.class).date);
-            System.out.println(readObject(join(dir, "info"), Commit.class).message);
+            System.out.println(dir);
+            System.out.println(readObject(join(join(COMMIT_DIR, dir), "info"), Commit.class).date);
+            System.out.println(readObject(join(join(COMMIT_DIR, dir), "info"), Commit.class).message);
         }
+    }
+
+    private static String[] listDirs(File dir) {
+        String[] directories = dir.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        System.out.println(Arrays.toString(directories));
+        return directories;
     }
 }
