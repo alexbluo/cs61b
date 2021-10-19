@@ -75,7 +75,7 @@ public class Repository {
         boolean go = true;
         if (!readContentsAsString(HEAD).equals("") && readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.get(file.toString()) != null && sha1(readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.get(file.toString()).getContents()).equals(fileHash)) {
             go = false;
-            if (!readContentsAsString(stagingFile).equals("")) {
+            if (!readContentsAsString(stagingFile).equals("") && readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
                 join(STAGING_AREA, sha1(((Blob) readObject(stagingFile, TreeMap.class).get(file.toString())).getContents())).delete();
                 try {
                     stagingTree.remove(file.toString());
@@ -117,6 +117,9 @@ public class Repository {
     //actually not sure if needed, check first
     @SuppressWarnings("unchecked")
     public static void rm(File file) {
+        if (!readObject(stagingFile, TreeMap.class).containsKey(file.toString()) && !readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.containsKey(file.toString())) {
+            System.out.println("No reason to remove the file.");
+        }
         try {
             if (readObject(stagingFile, TreeMap.class).containsKey(file.toString())) {
                 if (!readContentsAsString(stagingFile).equals("")) {
@@ -131,14 +134,13 @@ public class Repository {
                 writer.close();
                 writeObject(stagingFile, stagingTree);
             }
+            // doesnt work apparently
             if (readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.containsKey(file.toString()) && join(CWD, file.toString()).exists()) {
                 join(CWD, file.toString()).delete();
             }
-            if (!readObject(stagingFile, TreeMap.class).containsKey(file.toString()) && !readObject(join(join(COMMIT_DIR, readContentsAsString(HEAD)), "info"), Commit.class).blobs.containsKey(file.toString())) {
-                System.out.println("No reason to remove the file.");
-            }
         } catch (IllegalArgumentException | FileNotFoundException ex) {
-            System.out.println("No reason to remove the file.");
+            ex.printStackTrace();
+            System.out.println("ex dee");
         }
     }
 }
