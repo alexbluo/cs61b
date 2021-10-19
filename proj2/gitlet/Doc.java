@@ -38,6 +38,19 @@ public class Doc {
         }
     }
 
+    public static void find(String msg) {
+        boolean print = true;
+        for (String dir : listDirs(COMMIT_DIR)) {
+            if (readObject(join(join(COMMIT_DIR, dir), "info"), Commit.class).message.equals(msg)) {
+                System.out.println("> " + dir + " <");
+                System.out.println("*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*");
+                print = false;
+            }
+        }
+        if (print) {
+            System.out.println("Found no commit with that message.");
+        }
+    }
     private static String[] listDirs(File dir) {
         String[] directories = dir.list(new FilenameFilter() {
             @Override
@@ -45,7 +58,6 @@ public class Doc {
                 return new File(current, name).isDirectory();
             }
         });
-        System.out.println(Arrays.toString(directories));
         return directories;
     }
 }
