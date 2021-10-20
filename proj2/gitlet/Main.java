@@ -72,7 +72,13 @@ public class Main {
                 }
                 Doc.find(args[1]);
                 break;
-
+            case "status":
+                if (args.length != 1) {
+                    System.out.print("Incorrect operands.");
+                    System.exit(0);
+                }
+                Doc.status();
+                break;
             // TODO: IN FUTURE: PLEASE BREAK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             default:
                 System.out.println("No command with that name exists.");

@@ -51,6 +51,11 @@ public class Doc {
             System.out.println("Found no commit with that message.");
         }
     }
+
+    public static void status() {
+
+    }
+
     private static String[] listDirs(File dir) {
         String[] directories = dir.list(new FilenameFilter() {
             @Override
