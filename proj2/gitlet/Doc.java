@@ -53,7 +53,7 @@ public class Doc {
     }
 
     public static void status() {
-
+        // TODO: add removed files tracking in rm method
     }
 
     private static String[] listDirs(File dir) {
