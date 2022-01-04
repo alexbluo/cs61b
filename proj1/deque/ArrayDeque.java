@@ -3,8 +3,6 @@ package deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-//making nextFront and nextLast able to go negative/over array.length - 1 and using array.length - nextFront etc mightve PARTIALLY helped this massive abomination of a headache but too late now
-// nearly guaranteed to have a bug in it but please let me escape this nightmare
 public class ArrayDeque<Item> implements Iterable<Item>, Deque<Item> {
     Item[] array;
     private int size;
