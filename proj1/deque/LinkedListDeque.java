@@ -3,34 +3,34 @@ import java.util.*;
 
 public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
 
-    private class node {
-        public node prev;
+    private class Node {
+        public Node prev;
         public Item item;
-        public node next;
-        public node(node p, Item i, node n) {
+        public Node next;
+        public Node(Node p, Item i, Node n) {
             prev = p;
             item = i;
             next = n;
         }
     }
     private int size;
-    private final node sen;
-    private node currentNode;
+    private final Node sen;
+    private Node currentNode;
     private int currentIndex;
     public LinkedListDeque() {
-        sen = new node(null,  null, null);
+        sen = new Node(null,  null, null);
         sen.prev = sen;
         sen.next = sen.prev;
         currentNode = sen.next;
     }
     public void addFirst(Item item) {
-        node newNode = new node(sen, item, sen.next);
+        Node newNode = new node(sen, item, sen.next);
         sen.next.prev = newNode;
         sen.next = newNode;
         size++;
     }
     public void addLast(Item item) {
-        node newNode = new node(sen.prev, item, sen);
+        Node newNode = new node(sen.prev, item, sen);
         sen.prev.next = newNode;
         sen.prev = newNode;
 
@@ -40,7 +40,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         return size;
     }
     public void printDeque() {
-        node p = sen.next;
+        Node p = sen.next;
         for (int i = 0; i < size; i++) {
             System.out.print(p.item + " ");
             p = p.next;
